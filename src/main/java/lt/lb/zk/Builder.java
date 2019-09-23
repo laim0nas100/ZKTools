@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk;
 
 import java.util.LinkedList;
@@ -8,7 +5,7 @@ import java.util.function.Consumer;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public interface Builder<T> {
 

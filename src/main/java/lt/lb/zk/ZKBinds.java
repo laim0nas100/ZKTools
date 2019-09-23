@@ -22,7 +22,7 @@ import org.zkoss.zul.impl.InputElement;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public class ZKBinds {
 

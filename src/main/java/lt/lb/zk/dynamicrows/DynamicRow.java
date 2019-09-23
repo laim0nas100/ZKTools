@@ -38,6 +38,7 @@ import lt.lb.commons.misc.NestedException;
 import lt.lb.zk.ZKComponents;
 import lt.lb.zk.ZKValidation;
 import lt.lb.zk.ZKValidation.ExternalValidation;
+import lt.lb.zk.ZKValidation.ExternalValidator;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
@@ -105,7 +106,7 @@ public class DynamicRow {
     private BindingValue<Long> updater = new BindingValue<>(Java.getNanoTime());
     private BindingValue<Long> updateFinal = new BindingValue<>();
     private BindingValue<Boolean> visibleListener = new BindingValue<>(true);
-    private List<ZKValidation.ExternalValidation> validation = new LinkedList<>();
+    private ExternalValidator validator = new ZKValidation.ExternalValidator();
     private BiConsumer<DynamicRow, List<Cell>> rowMaker;
     private List<Runnable> onDisplay = new LinkedList<>();
     private List<Runnable> viewUpdatesList = new LinkedList<>();
@@ -844,11 +845,11 @@ public class DynamicRow {
     }
 
     public boolean checkIsInvalid(boolean full) {
-        return !ZKValidation.externalValidation(validation, full);
+        return validator.isInvalid(full);
     }
 
     public DynamicRow withValidation(ZKValidation.ExternalValidation valid) {
-        this.validation.add(valid);
+        this.validator.add(valid);
         return this;
     }
 

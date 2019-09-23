@@ -7,7 +7,7 @@ import org.zkoss.zk.ui.event.EventListener;
 
 /**
  *
- * @author Laimonas-Beniusis-PC
+ * @author laim0nas100
  */
 public class ZKTools {
 

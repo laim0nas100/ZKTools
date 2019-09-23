@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,7 @@ import org.zkoss.zul.impl.InputElement;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public class ZKValidation {
 
@@ -129,7 +130,41 @@ public class ZKValidation {
         public boolean isValid() {
             return valid.get();
         }
+        
+        public ExternalValidation addTo(ExternalValidator validator){
+            validator.add(this);
+            return this;
+        }
+        
+        
 
+    }
+    
+    
+    public static class ExternalValidator {
+        private List<ExternalValidation> validations = new LinkedList<>();
+        
+        public ExternalValidator add(ExternalValidation extVal){
+            validations.add(extVal);
+            return this;
+        }
+        
+        public boolean isValid(boolean full){
+            return externalValidation(validations, full);
+        }
+        
+        public boolean isValid(){
+            return isValid(true);
+        }
+        
+        public boolean isInvalid(boolean full){
+            return !isValid(full);
+        }
+        
+        public boolean isInvalid(){
+            return !isValid(true);
+        }
+        
     }
 
     // try to ensure uniqueness
