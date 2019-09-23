@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lt.lb.zk;
 
 import java.util.concurrent.Callable;
@@ -29,7 +24,6 @@ import org.zkoss.zul.Window;
  * @see #showModal()
  * @see #hide(Object)
  * @see #setResultProvider(Callable)
- * @author Serzhas
  */
 public class DWindow extends Window implements AfterCompose {
 
@@ -77,9 +71,9 @@ public class DWindow extends Window implements AfterCompose {
 
     /**
      * Performs clean-up, hides dialog window and posts
-     * <code>App.EVENT_ON_DIALOG_CLOSED</code> event with specified result.
+     * <code>DIALOG_CLOSE_EVENT</code> event with specified result.
      *
-     * @param result data to post with <code>App.EVENT_ON_DIALOG_CLOSED</code>
+     * @param result data to post with <code>DIALOG_CLOSE_EVENT</code>
      * event
      */
     protected void closeDialog(Object result) {
@@ -164,8 +158,7 @@ public class DWindow extends Window implements AfterCompose {
 
     /**
      * Sets optional dialog result provider which will be used when dialog is
-     * closed by Events#ON_CLOSE event to pass result with
-     * {@link App#ON_DIALOG_CLOSED} event
+     * closed by Events#ON_CLOSE
      */
     public void setResultProvider(Callable<?> resultProvider) {
         this.resultProvider = resultProvider;
