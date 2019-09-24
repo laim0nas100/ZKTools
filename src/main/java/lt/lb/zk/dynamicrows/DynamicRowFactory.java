@@ -82,7 +82,7 @@ public interface DynamicRowFactory {
     public static Cell simpleCellTemplate() {
         Cell cellTemplate = new Cell();
         cellTemplate.setStyle("margin: 5px");
-        cellTemplate.setStyle("padding: 5px");
+//        cellTemplate.setStyle("padding: 5px");
 //            cellTemplate.setHflex("min");
         cellTemplate.setVflex("min");
         cellTemplate.setAlign("center");
@@ -100,17 +100,17 @@ public interface DynamicRowFactory {
     public static BiConsumer<Boolean, DynamicRow> disableDecorator() {
         String styleString = ";background-color: #e6e6e6 !important;"; //override default odd coloring
         return (dis, r) -> {
-            Component comp = r.getRow();
-            if (comp instanceof HtmlBasedComponent) {
-                HtmlBasedComponent html = F.cast(comp);
-                if (dis) {
-                    html.setStyle(F.nullWrap(html.getStyle(), "") + styleString);
-                } else {
-                    html.setStyle(StringOp.remove(html.getStyle(), styleString));
-                }
-            } else {
-                throw new IllegalArgumentException("Style is unsupported in " + comp);
-            }
+//            Component comp = r.getRow();
+//            if (comp instanceof HtmlBasedComponent) {
+//                HtmlBasedComponent html = F.cast(comp);
+//                if (dis) {
+//                    html.setStyle(F.nullWrap(html.getStyle(), "") + styleString);
+//                } else {
+//                    html.setStyle(StringOp.remove(html.getStyle(), styleString));
+//                }
+//            } else {
+//                throw new IllegalArgumentException("Style is unsupported in " + comp);
+//            }
 
             int size = r.getCellCount();
             for (int i = 0; i < size; i++) {

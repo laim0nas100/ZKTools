@@ -75,8 +75,6 @@ public class DynamicRows {
         return all;
     });
 
-    
-    
     public DynamicRows(Component root, Component rows, DynamicRowFactory factory, String key) {
         rootComponent = root;
         rowComponent = rows;
@@ -90,8 +88,7 @@ public class DynamicRows {
     }
 
     public DynamicRows(String key) {
-        Grid grid = ZKComponents.getGridWithComponents();
-        grid.setOddRowSclass("z-row");
+        Grid grid = ZKComponents.gridForDynamicRows();
         rootComponent = grid;
         rowComponent = grid.getRows();
         dynamicRowFactory = DynamicRowFactory.withRow();
@@ -119,22 +116,6 @@ public class DynamicRows {
         return rowMap.values().stream().collect(Collectors.toList());
     }
 
-    public void addRow(Integer index, DynamicRow row) {
-        if (rowMap.containsKey(row.getKey())) {
-            throw new IllegalArgumentException("Row with key:" + row.getKey() + " is allready present");
-        }
-
-        if (index >= 0) {
-            rowComponent.getChildren().add(index, row.getRow());
-        } else {
-            rowComponent.appendChild(row.getRow());
-        }
-        rowMap.put(row.getKey(), row);
-        putKeyAt(index, row.getKey());
-        rowKeyOrder.invalidate();// manual trigger of update
-
-    }
-
     private void putKeyAt(Integer index, String key) {
         if (index >= 0) {
             keyOrder.add(index, key);
@@ -146,9 +127,9 @@ public class DynamicRows {
     private void removeKey(String key) {
         keyOrder.remove(key);
     }
-    
-    public void removeIfContainsRow(String key){
-        if(rowMap.containsKey(key)){
+
+    public void removeIfContainsRow(String key) {
+        if (rowMap.containsKey(key)) {
             removeRow(key);
         }
     }
@@ -174,9 +155,33 @@ public class DynamicRows {
         this.rowComponent.invalidate();
     }
 
+    public void addRow(Integer index, DynamicRow row) {
+        if (rowMap.containsKey(row.getKey())) {
+            throw new IllegalArgumentException("Row with key:" + row.getKey() + " is allready present");
+        }
+
+        if (index >= 0) {
+            rowComponent.getChildren().add(index, row.getRow());
+        } else {
+            rowComponent.appendChild(row.getRow());
+        }
+        rowMap.put(row.getKey(), row);
+        putKeyAt(index, row.getKey());
+        rowKeyOrder.invalidate();// manual trigger of update
+
+    }
+
     public void addRowAfter(String key, DynamicRow row) {
         Integer index = rowKeyOrder.get().getOrDefault(key, -10);
         addRow(index + 1, row);
+    }
+
+    public void addFirst(DynamicRow row) {
+        this.addRow(0, row);
+    }
+
+    public void addRow(DynamicRow row) {
+        this.addRow(-1, row);
     }
 
     public List<Object> getDynamicRowsAndRowsInOrder() {
@@ -193,7 +198,7 @@ public class DynamicRows {
         DynamicRow newRow = dynamicRowFactory.newRow(rows.composableKey);
         this.addRow(index, newRow);
         this.composable.put(rows.composableKey, rows);
-        
+
         newRow.add(rows.getRootComponent()).display();
         rows.parentComponent = () -> this.getParentComponent();
     }
@@ -204,14 +209,6 @@ public class DynamicRows {
 
     public Integer getRowIndex(String key) {
         return keyOrder.indexOf(key);
-    }
-
-    public void addFirst(DynamicRow row) {
-        this.addRow(0, row);
-    }
-
-    public void addRow(DynamicRow row) {
-        this.addRow(-1, row);
     }
 
     public Optional<DynamicRow> getRowIf(String key, Predicate<DynamicRow> comp) {
@@ -336,7 +333,7 @@ public class DynamicRows {
     public String toString() {
         return "DynamicRows{" + "composableKey=" + composableKey + '}';
     }
-    
+
     public void updateForm() {
         this.doInOrder(
                 rows -> rows.updateForm(),

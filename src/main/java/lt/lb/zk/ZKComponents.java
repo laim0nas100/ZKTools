@@ -1,12 +1,20 @@
 package lt.lb.zk;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.io.Resources;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
 import lt.lb.commons.UUIDgenerator;
+import lt.lb.commons.containers.caching.LazyValue;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.misc.Range;
 import lt.lb.zk.Builder.EagerBuilder;
@@ -108,6 +116,16 @@ public class ZKComponents {
         grid.appendChild(new Foot());
 
         return grid;
+    }
+
+
+    public static Grid gridForDynamicRows() {
+        URL resource = Resources.getResource("DynamicRowsGridBase.zul");
+
+        return F.unsafeCall(() -> {
+            Component root = Executions.createComponentsDirectly(Resources.toString(resource, Charsets.UTF_8), "zul", null, null);
+            return (Grid) ZKSelect.selectFirst(p -> p instanceof Grid, root).get();
+        });
     }
 
     public static <T extends Component> T createZulComponent(String compName, Map<?, ?> args, Component parent, Tuple<String, Object>... params) {
