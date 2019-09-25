@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -21,7 +22,6 @@ import lt.lb.commons.Log;
 import lt.lb.commons.UUIDgenerator;
 import lt.lb.commons.containers.caching.LazyDependantValue;
 import lt.lb.commons.misc.ExtComparator;
-import lt.lb.zk.ZKComponents;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Grid;
@@ -32,10 +32,11 @@ import org.zkoss.zul.Grid;
  */
 public class DynamicRows {
 
-    static final int maxTotalColspan = 100;
+    private DynamicRow updaterRow;
+    static final int maxTotalColspan = 1000;
     private Component rootComponent;
     private Component rowComponent;
-    private Supplier<Component> parentComponent;
+    private Supplier<Component> parentSupplier;
     private Map<String, DynamicRow> rowMap = new HashMap<>();
     private List<String> keyOrder = new ArrayList<>();
     private DynamicRowFactory dynamicRowFactory;
@@ -61,39 +62,48 @@ public class DynamicRows {
     });
 
     private LazyDependantValue<List> dynamicRowsAndRowsInOrder = rowsInOrder.map(m -> {
-        List<Object> all = new LinkedList<>();
-        all.addAll(m);
-        F.iterate(this.composable, (key, row) -> {
-            int index = rowKeyOrder.get().getOrDefault(key, 0);
-            if (index > 0) {
-                all.add(index, row);
-            } else {
-                all.add(0, row);
-            }
+
+        Map<Integer, List> composed = new HashMap<>();
+
+        F.iterate(this.composable, (key, rows) -> {
+            int index = Math.max(rowKeyOrder.get().getOrDefault(key, 0), 0);
+            composed.computeIfAbsent(index, i -> new LinkedList<>()).add(rows);
         });
 
-        return all;
+        F.iterate(m, (key, row) -> {
+            composed.computeIfAbsent(key, i -> new LinkedList<>()).add(row);
+        });
+
+        Stream<Object> flatMap = composed.entrySet().stream().sorted(ExtComparator.ofValue(v -> v.getKey()))
+                .map(entry -> entry.getValue())
+                .flatMap(list -> list.stream());
+                
+
+        List collect = flatMap.collect(Collectors.toList());
+        return collect;
     });
 
     public DynamicRows(Component root, Component rows, DynamicRowFactory factory, String key) {
         rootComponent = root;
         rowComponent = rows;
         dynamicRowFactory = factory;
+        this.updaterRow = dynamicRowFactory.newRow("Updater");
         this.composableKey = key;
-        this.parentComponent = () -> getRootComponent().getParent();
+        this.parentSupplier = () -> getRootComponent().getParent();
     }
 
     public DynamicRows(Component root, Component rows, DynamicRowFactory factory) {
         this(root, rows, factory, UUIDgenerator.nextUUID("DynamicRows"));
     }
 
-    public DynamicRows(String key) {
-        Grid grid = ZKComponents.gridForDynamicRows();
+    public DynamicRows(Grid grid, String key) {
         rootComponent = grid;
         rowComponent = grid.getRows();
+        Objects.requireNonNull(rowComponent, "row component must not be null");
         dynamicRowFactory = DynamicRowFactory.withRow();
         this.composableKey = key;
-        this.parentComponent = () -> getRootComponent().getParent();
+        this.updaterRow = dynamicRowFactory.newRow("Updater");
+        this.parentSupplier = () -> getRootComponent().getParent();
     }
 
     public String getComposableKey() {
@@ -110,6 +120,10 @@ public class DynamicRows {
 
     public List<Component> getRowComponents() {
         return rowMap.values().stream().map(m -> m.getRow()).collect(Collectors.toList());
+    }
+
+    public boolean isEmpty() {
+        return rowMap.isEmpty();
     }
 
     public List<DynamicRow> getRows() {
@@ -199,8 +213,13 @@ public class DynamicRows {
         this.addRow(index, newRow);
         this.composable.put(rows.composableKey, rows);
 
+        
+        newRow.withUpdateListener(r -> {
+            r.setVisible(!rows.isEmpty());
+        });
+        newRow.updateDependsOn(rows.updaterRow);
         newRow.add(rows.getRootComponent()).display();
-        rows.parentComponent = () -> this.getParentComponent();
+        rows.parentSupplier = () -> this.getParentComponent();
     }
 
     public void composeRowsLast(DynamicRows rows) {
@@ -335,6 +354,7 @@ public class DynamicRows {
     }
 
     public void updateForm() {
+        updaterRow.updateForm();
         this.doInOrder(
                 rows -> rows.updateForm(),
                 row -> row.updateForm()
@@ -367,6 +387,7 @@ public class DynamicRows {
     }
 
     public void updateView() {
+        this.updaterRow.updateView();
         this.doInOrder(
                 rows -> rows.updateView(),
                 row -> {
@@ -378,6 +399,7 @@ public class DynamicRows {
     }
 
     public void update() {
+        this.updaterRow.update();
         this.doInOrder(
                 rows -> rows.update(),
                 row -> {
@@ -411,7 +433,7 @@ public class DynamicRows {
     }
 
     public Component getParentComponent() {
-        return parentComponent.get();
+        return parentSupplier.get();
     }
 
 }

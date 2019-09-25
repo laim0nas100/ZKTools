@@ -118,15 +118,7 @@ public class ZKComponents {
         return grid;
     }
 
-
-    public static Grid gridForDynamicRows() {
-        URL resource = Resources.getResource("DynamicRowsGridBase.zul");
-
-        return F.unsafeCall(() -> {
-            Component root = Executions.createComponentsDirectly(Resources.toString(resource, Charsets.UTF_8), "zul", null, null);
-            return (Grid) ZKSelect.selectFirst(p -> p instanceof Grid, root).get();
-        });
-    }
+    
 
     public static <T extends Component> T createZulComponent(String compName, Map<?, ?> args, Component parent, Tuple<String, Object>... params) {
         LineStringBuilder zk = new LineStringBuilder();
