@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import lt.lb.commons.ArrayOp;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.caching.LazyValue;
@@ -27,6 +28,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.impl.InputElement;
 
 /**
@@ -97,13 +99,14 @@ public class ZKValidation {
         }
 
         private Supplier<Component[]> supplier(ExternalValidationBuilder b) {
-            
+
             Supplier<Component[]> supplier = _supplier(b);
             if (b.staticComps) { //optimize (call only once)
                 return new LazyValue<>(supplier);
             }
             return supplier;
         }
+
         private Supplier<Component[]> _supplier(ExternalValidationBuilder b) {
             return () -> {
                 return b.components.stream().map(m -> m.get()).toArray(s -> new Component[s]);
@@ -121,6 +124,10 @@ public class ZKValidation {
         private final Supplier<Boolean> valid;
         private final Supplier<String> message;
 
+        public static ExternalValidation alwaysValid() {
+            return new ExternalValidation(() -> ArrayOp.asArray(new Label()), () -> true, () -> "");
+        }
+
         public ExternalValidation(Supplier<Component[]> c, Supplier<Boolean> valid, Supplier<String> msg) {
             component = c;
             this.valid = valid;
@@ -130,41 +137,39 @@ public class ZKValidation {
         public boolean isValid() {
             return valid.get();
         }
-        
-        public ExternalValidation addTo(ExternalValidator validator){
+
+        public ExternalValidation addTo(ExternalValidator validator) {
             validator.add(this);
             return this;
         }
-        
-        
 
     }
-    
-    
+
     public static class ExternalValidator {
+
         private List<ExternalValidation> validations = new LinkedList<>();
-        
-        public ExternalValidator add(ExternalValidation extVal){
+
+        public ExternalValidator add(ExternalValidation extVal) {
             validations.add(extVal);
             return this;
         }
-        
-        public boolean isValid(boolean full){
+
+        public boolean isValid(boolean full) {
             return externalValidation(validations, full);
         }
-        
-        public boolean isValid(){
+
+        public boolean isValid() {
             return isValid(true);
         }
-        
-        public boolean isInvalid(boolean full){
+
+        public boolean isInvalid(boolean full) {
             return !isValid(full);
         }
-        
-        public boolean isInvalid(){
+
+        public boolean isInvalid() {
             return !isValid(true);
         }
-        
+
     }
 
     // try to ensure uniqueness
