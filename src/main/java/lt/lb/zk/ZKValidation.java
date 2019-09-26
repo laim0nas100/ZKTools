@@ -326,7 +326,7 @@ public class ZKValidation {
         }
 
         public static Supplier<Boolean> validationNotBlank(InputElement elem) {
-            return () -> !StringOp.isNotBlank(elem.getText());
+            return () -> StringOp.isNotBlank(elem.getText());
         }
 
         public static Supplier<Boolean> validationNoFuture(Datebox elem, boolean nullTolerance) {

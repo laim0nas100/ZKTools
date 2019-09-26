@@ -380,6 +380,9 @@ public class DynamicRow {
                 mapper.getOnSelectionUpdate().forEach(Runnable::run);
             });
         }
+        if(mapper.getPreselectedIndex() > 0 ){
+            combo.setSelectedIndex(mapper.getPreselectedIndex());
+        }
         return this.add(combo);
 
     }
@@ -569,14 +572,13 @@ public class DynamicRow {
         return add(listbox);
     }
 
-    public <T> DynamicRow addListElems(ListitemRenderer<T> renderer,ListModel<T> list) {
+    public <T> DynamicRow addListElems(ListitemRenderer<T> renderer, ListModel<T> list) {
         Listbox listbox = new Listbox();
         listbox.appendChild(new Listhead());
         listbox.setModel(list);
         listbox.setItemRenderer(renderer);
         return add(listbox);
     }
-
 
     public <T> DynamicRow addList(ListitemRenderer<T> renderer, Supplier<Collection<T>> supp) {
         ListModelList<T> model = new ListModelList<>();
@@ -585,11 +587,11 @@ public class DynamicRow {
             model.clear();
             model.addAll(supp.get());
         });
-        return addListElems(renderer,model);
+        return addListElems(renderer, model);
     }
 
-    public <T,R> DynamicRow addList(ListitemRenderer<R> renderer,Supplier<Collection<T>> collection, Function<? super T, R> mapper) {
-        return addList(renderer,() -> {
+    public <T, R> DynamicRow addList(ListitemRenderer<R> renderer, Supplier<Collection<T>> collection, Function<? super T, R> mapper) {
+        return addList(renderer, () -> {
             return collection.get().stream().map(mapper).collect(Collectors.toList());
         });
 
@@ -662,6 +664,15 @@ public class DynamicRow {
             this.tags.add(t);
         }
         return this;
+    }
+
+    public DynamicRow withStyle(int index, String style) {
+        return this.withComponentDecorator(index, c -> {
+            if(c instanceof HtmlBasedComponent){
+                HtmlBasedComponent comp = F.cast(c);
+                comp.setStyle(style);
+            }
+        });
     }
 
     public Cell getCell(int index) {
