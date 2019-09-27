@@ -28,6 +28,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.impl.InputElement;
 
@@ -125,7 +126,7 @@ public class ZKValidation {
         private final Supplier<String> message;
 
         public static ExternalValidation alwaysValid() {
-            return new ExternalValidation(() -> ArrayOp.asArray(new Label()), () -> true, () -> "");
+            return builder().with(new Div()).withMessage("").withValidation(() -> true);
         }
 
         public ExternalValidation(Supplier<Component[]> c, Supplier<Boolean> valid, Supplier<String> msg) {
