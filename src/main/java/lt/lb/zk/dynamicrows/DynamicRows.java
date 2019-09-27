@@ -77,7 +77,6 @@ public class DynamicRows {
         Stream<Object> flatMap = composed.entrySet().stream().sorted(ExtComparator.ofValue(v -> v.getKey()))
                 .map(entry -> entry.getValue())
                 .flatMap(list -> list.stream());
-                
 
         List collect = flatMap.collect(Collectors.toList());
         return collect;
@@ -198,6 +197,10 @@ public class DynamicRows {
         this.addRow(-1, row);
     }
 
+    public Optional<DynamicRow> getLastRow() {
+        return this.getRowsInOrder().stream().reduce((first, second) -> second);
+    }
+
     public List<Object> getDynamicRowsAndRowsInOrder() {
         List list = dynamicRowsAndRowsInOrder.get();
 //        Log.printLines(list);
@@ -213,7 +216,6 @@ public class DynamicRows {
         this.addRow(index, newRow);
         this.composable.put(rows.composableKey, rows);
 
-        
         newRow.withUpdateListener(r -> {
             r.setVisible(!rows.isEmpty());
         });
