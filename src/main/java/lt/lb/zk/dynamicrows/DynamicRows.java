@@ -95,6 +95,10 @@ public class DynamicRows {
         this(root, rows, factory, UUIDgenerator.nextUUID("DynamicRows"));
     }
 
+    public DynamicRows(Grid grid) {
+        this(grid, UUIDgenerator.nextUUID("DynamicRows"));
+    }
+
     public DynamicRows(Grid grid, String key) {
         rootComponent = grid;
         rowComponent = grid.getRows();
