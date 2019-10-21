@@ -57,8 +57,11 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.ListitemRenderer;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Space;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Vbox;
 
 /**
  *
@@ -364,31 +367,69 @@ public class DynamicRow {
 
     }
 
-    public <T> DynamicRow addCombobox(ComboboxMapper<T> mapper) {
-        Combobox combo = new Combobox();
-        for (String item : mapper.getNames()) {
-            combo.appendItem(item);
-        }
-        combo.setReadonly(mapper.isReadOnly());
-        mapper.box = combo;
-        if (!mapper.getOnSelectionUpdate().isEmpty()) {
+    public <T> DynamicRow addRadioCombobox(RadioComboboxMapper<T> mapper) {
+
+        boolean updatesNotEmpty = !mapper.getOnSelectionUpdate().isEmpty();
+        if (mapper.isRadio()) {
+            Radiogroup radio = new Radiogroup();
+
+            Component radioParent;
+            if (mapper.isVertical()) {
+                Vbox vb = new Vbox();
+                vb.setAlign("left");
+                radioParent = vb;
+                radio.appendChild(vb);
+            }else{
+                radio.setOrient("horizontal");
+                radioParent = radio;
+            }
+
+            for (String item : mapper.getNames()) {
+                Radio r = new Radio(item);
+                radioParent.appendChild(r);
+                r.setRadiogroup(radio);
+                r.setDisabled(mapper.isDisabled());
+            }
+            mapper.radio = radio;
+            if (mapper.getPreselectedIndex() > 0) {
+                radio.setSelectedIndex(mapper.getPreselectedIndex());
+            }
+            if (updatesNotEmpty) {
+                radio.addEventListener(Events.ON_SELECT, l -> {
+                    this.update();
+                });
+            }
+        } else {
+            Combobox combo = new Combobox();
+            for (String item : mapper.getNames()) {
+                combo.appendItem(item);
+            }
+            combo.setReadonly(mapper.isReadOnly());
+            combo.setDisabled(mapper.isDisabled());
+            mapper.combo = combo;
+            if (mapper.getPreselectedIndex() > 0) {
+                combo.setSelectedIndex(mapper.getPreselectedIndex());
+            }
             combo.addEventListener(Events.ON_SELECT, l -> {
                 this.update();
             });
-
+        }
+        if (updatesNotEmpty) {
             this.withUpdateListener(r -> {
                 mapper.getOnSelectionUpdate().forEach(Runnable::run);
             });
         }
-        if(mapper.getPreselectedIndex() > 0 ){
-            combo.setSelectedIndex(mapper.getPreselectedIndex());
-        }
-        return this.add(combo);
+
+        return mapper.isRadio() ? this.add(mapper.radio) : this.add(mapper.combo);
 
     }
 
+    public DynamicRow addRadiobox(String... things) {
+        return addRadioCombobox(RowComp.comboNames(things).withRadio(true));
+    }
+
     public DynamicRow addCombobox(String... things) {
-        return addCombobox(RowComp.comboNames(things).withReadOnly(true));
+        return addRadioCombobox(RowComp.comboNames(things).withReadOnly(true));
     }
 
     public DynamicRow addComponentDirectly(String compName) {
@@ -668,7 +709,7 @@ public class DynamicRow {
 
     public DynamicRow withStyle(int index, String style) {
         return this.withComponentDecorator(index, c -> {
-            if(c instanceof HtmlBasedComponent){
+            if (c instanceof HtmlBasedComponent) {
                 HtmlBasedComponent comp = F.cast(c);
                 comp.setStyle(style);
             }

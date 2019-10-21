@@ -12,22 +12,22 @@ import java.util.stream.Stream;
  */
 public class RowComp {
 
-    public static <R extends Enum> ComboboxMapper<R> comboEnum(Class<R> cls, Function<R, String> mapper) {
-        ComboboxMapper<R> cbm = new ComboboxMapper<>();
+    public static <R extends Enum> RadioComboboxMapper<R> comboEnum(Class<R> cls, Function<R, String> mapper) {
+        RadioComboboxMapper<R> cbm = new RadioComboboxMapper<>();
         return cbm.withOptions(Stream.of(cls.getEnumConstants()).collect(Collectors.toList())).withMapper(mapper);
     }
 
-    public static <R extends Enum> ComboboxMapper<R> comboEnumDefaultNames(Class<R> cls) {
+    public static <R extends Enum> RadioComboboxMapper<R> comboEnumDefaultNames(Class<R> cls) {
         return comboEnum(cls, Enum::name);
     }
 
-    public static <R> ComboboxMapper<R> comboMapped(Collection<R> opt, Function<R, String> mapper) {
-        ComboboxMapper<R> cbm = new ComboboxMapper<>();
+    public static <R> RadioComboboxMapper<R> comboMapped(Collection<R> opt, Function<R, String> mapper) {
+        RadioComboboxMapper<R> cbm = new RadioComboboxMapper<>();
         return cbm.withOptions(opt).withMapper(mapper);
     }
 
-    public static ComboboxMapper<String> comboNames(String... names) {
-        ComboboxMapper<String> cbm = new ComboboxMapper<>();
+    public static RadioComboboxMapper<String> comboNames(String... names) {
+        RadioComboboxMapper<String> cbm = new RadioComboboxMapper<>();
         return cbm.withOptions(Arrays.asList(names)).withMapper(s -> s);
 
     }

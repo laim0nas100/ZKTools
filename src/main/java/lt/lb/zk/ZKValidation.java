@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,10 +12,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import lt.lb.commons.ArrayOp;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.caching.LazyValue;
+import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.containers.values.BooleanValue;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.func.unchecked.UnsafeSupplier;
@@ -29,7 +30,6 @@ import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.impl.InputElement;
 
 /**
@@ -155,6 +155,13 @@ public class ZKValidation {
             return this;
         }
 
+        public ExternalValidator addRecursive(Component comp, boolean full) {
+            ZKValidation.collectConstraints(t->true, comp).stream()
+                    .map(ref -> new ExternalValidationBuilder().with(ref.input).withMessage(ref.msgSupl).withValidation(ref.validSupl))
+                    .forEach(this::add);
+            return this;
+        }
+
         public boolean isValid(boolean full) {
             return externalValidation(validations, full);
         }
@@ -225,6 +232,46 @@ public class ZKValidation {
         return isValid;
     }
 
+    private static class CompReformed {
+
+        InputElement input;
+        final Supplier<Optional<WrongValueException>> exSupl = () -> {
+            try {
+                input.getText();
+                return Optional.empty();
+            } catch (WrongValueException e) {
+                return Optional.ofNullable(e);
+            }
+        };
+        final Supplier<String> msgSupl = () -> {
+            return exSupl.get().map(m -> m.getMessage()).orElse("");
+        };
+        final Supplier<Boolean> validSupl = () -> {
+            return !exSupl.get().isPresent();
+        };
+
+        public CompReformed(InputElement input) {
+            this.input = input;
+        }
+
+    }
+
+    private static List<CompReformed> collectConstraints(Predicate<Component> includeFilter, Component root) {
+        List<CompReformed> list = new ArrayList<>();
+        getTreeVisitor(includeFilter, comp -> {
+            if (comp instanceof InputElement) {
+                InputElement input = (InputElement) comp;
+                Constraint cons = input.getConstraint();
+                if (cons != null) {
+                    list.add(new CompReformed(input));
+                }
+            }
+            return false;
+        }).BFS(root, new HashSet<>());
+        return list;
+
+    }
+
     public static boolean externalValidation(Collection<ExternalValidation> validations, boolean full) {
         BooleanValue valid = new BooleanValue(true);
         Map<Component, List<ExternalValidation>> map = new LinkedHashMap<>();
@@ -272,6 +319,17 @@ public class ZKValidation {
 
     public static boolean recursiveIsValidFull(Predicate<Component> includeFilter, Component... rootComps) {
         return recursiveIsValidTree(includeFilter, true, rootComps);
+    }
+
+    private static TreeVisitor<Component> getTreeVisitor(Predicate<Component> includeFilter, Visitor<Component> compVisitor) {
+        return TreeVisitor.of(compVisitor, c -> {
+            if (includeFilter.test(c)) {
+                return ReadOnlyIterator.of(c.getChildren());
+            } else {
+                return ReadOnlyIterator.of();
+            }
+
+        });
     }
 
     private static TreeVisitor<Component> getTreeValidationVisitor(Predicate<Component> includeFilter, boolean full, ValueProxy<Boolean> validSafe) {
