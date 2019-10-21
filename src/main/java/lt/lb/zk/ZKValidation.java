@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.caching.LazyValue;
-import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.containers.values.BooleanValue;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.func.unchecked.UnsafeSupplier;
@@ -179,6 +178,13 @@ public class ZKValidation {
                     .map(ref -> new ExternalValidationBuilder().with(ref.input).withMessage(ref.msgSupl).withValidation(ref.validSupl))
                     .forEach(this::add);
             return this;
+        }
+        
+        public ExternalValidator combine(ExternalValidator other){
+            ExternalValidator combined = new ExternalValidator();
+            combined.validations.addAll(this.validations);
+            combined.validations.addAll(other.validations);
+            return combined;
         }
 
         public boolean isValid(boolean full) {
