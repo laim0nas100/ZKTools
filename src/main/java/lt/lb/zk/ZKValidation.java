@@ -40,6 +40,7 @@ public class ZKValidation {
 
     public static class ExternalValidationBuilder {
 
+        private ExternalValidator validator;
         boolean staticComps = true;
         List<Supplier<? extends Component>> components = new ArrayList<>();
 
@@ -67,12 +68,15 @@ public class ZKValidation {
             ExternalValidationBuilder1 b = new ExternalValidationBuilder1();
             b.prev = this;
             b.msg = str;
+            b.validator = this.validator;
             return b;
 
         }
     }
 
     public static class ExternalValidationBuilder1 {
+
+        private ExternalValidator validator;
 
         private ExternalValidationBuilder1() {
         }
@@ -81,12 +85,21 @@ public class ZKValidation {
         private Supplier<String> msg;
 
         public ExternalValidation withValidation(Supplier<Boolean> supp) {
-            return new ExternalValidation(supplier(this.prev), supp, msg);
+
+            ExternalValidation v = new ExternalValidation(supplier(this.prev), supp, msg);
+            if (validator != null) {
+                validator.add(v);
+            }
+            return v;
         }
 
         public ExternalValidation withValidation(Predicate<Component[]> pred) {
             Supplier<Component[]> supplier = supplier(this.prev);
-            return new ExternalValidation(supplier, () -> pred.test(supplier.get()), msg);
+            ExternalValidation v = new ExternalValidation(supplier, () -> pred.test(supplier.get()), msg);
+            if (validator != null) {
+                validator.add(v);
+            }
+            return v;
         }
 
         public ExternalValidation withSafeValidation(UnsafeSupplier<Boolean> supp) {
@@ -155,8 +168,14 @@ public class ZKValidation {
             return this;
         }
 
+        public ExternalValidationBuilder builder() {
+            ExternalValidationBuilder b = new ExternalValidationBuilder();
+            b.validator = this;
+            return b;
+        }
+
         public ExternalValidator addRecursive(Component comp, boolean full) {
-            ZKValidation.collectConstraints(t->true, comp).stream()
+            ZKValidation.collectConstraints(t -> true, comp).stream()
                     .map(ref -> new ExternalValidationBuilder().with(ref.input).withMessage(ref.msgSupl).withValidation(ref.validSupl))
                     .forEach(this::add);
             return this;
