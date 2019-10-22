@@ -14,8 +14,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
+import lt.lb.commons.containers.caching.LazyDependantValue;
 import lt.lb.commons.containers.caching.LazyValue;
 import lt.lb.commons.containers.values.BooleanValue;
+import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.func.unchecked.UnsafeSupplier;
 import lt.lb.commons.iteration.ReadOnlyIterator;
@@ -175,12 +177,12 @@ public class ZKValidation {
 
         public ExternalValidator addRecursive(Component comp, boolean full) {
             ZKValidation.collectConstraints(t -> true, comp).stream()
-                    .map(ref -> new ExternalValidationBuilder().with(ref.input).withMessage(ref.msgSupl).withValidation(ref.validSupl))
+                    .map(ref -> ref.buildExternalValidation(true))
                     .forEach(this::add);
             return this;
         }
-        
-        public ExternalValidator combine(ExternalValidator other){
+
+        public ExternalValidator combine(ExternalValidator other) {
             ExternalValidator combined = new ExternalValidator();
             combined.validations.addAll(this.validations);
             combined.validations.addAll(other.validations);
@@ -206,7 +208,7 @@ public class ZKValidation {
     }
 
     // try to ensure uniqueness
-    public static final String WRONG_VALUE_KEY = System.nanoTime() % 100 + "ZK_Wrong_Value_Key" + (System.nanoTime() + 50) % 1000;
+    public static final String WRONG_VALUE_KEY = System.nanoTime() % 100 + "_ZK_Wrong_Value_Key_" + (System.nanoTime() + 50) % 1000;
 
     /**
      * Mark component with wrong value (does not affect display)
@@ -260,23 +262,51 @@ public class ZKValidation {
     private static class CompReformed {
 
         InputElement input;
-        final Supplier<Optional<WrongValueException>> exSupl = () -> {
-            try {
-                input.getText();
-                return Optional.empty();
-            } catch (WrongValueException e) {
-                return Optional.ofNullable(e);
-            }
-        };
-        final Supplier<String> msgSupl = () -> {
-            return exSupl.get().map(m -> m.getMessage()).orElse("");
-        };
-        final Supplier<Boolean> validSupl = () -> {
-            return !exSupl.get().isPresent();
-        };
 
         public CompReformed(InputElement input) {
             this.input = input;
+        }
+
+        public ExternalValidation buildExternalValidation(boolean replace) {
+            LazyDependantValue<Optional<WrongValueException>> exSupl;
+            if (!replace) {
+                exSupl = new LazyDependantValue<>(() -> {
+                    try {
+                        input.getText();
+                        return Optional.empty();
+                    } catch (WrongValueException e) {
+                        return Optional.ofNullable(e);
+                    }
+                });
+
+            } else {
+                Constraint constraint = input.getConstraint();
+                
+                Value<WrongValueException> proxyConst = new Value<>();
+                exSupl = new LazyDependantValue<>(() -> {
+                    input.getText();
+                    return proxyConst.toOptional();
+                });
+
+                TransformedContraint newCon = (Component comp, Object value) -> {
+                    try {
+                        constraint.validate(comp, value);
+                        proxyConst.set(null);
+                    } catch (WrongValueException ex) {
+                        proxyConst.set(ex);
+                    }
+                };
+
+                input.setConstraint(newCon);
+            }
+
+            LazyDependantValue<String> msgSupl = exSupl.map(m -> m.map(ex -> ex.getMessage()).orElse(""));
+            LazyDependantValue<Boolean> validLazySupl = exSupl.map(m -> !m.isPresent());
+            Supplier<Boolean> validSupl = ()->{
+                exSupl.invalidate();
+                return validLazySupl.get();
+            };
+            return new ExternalValidationBuilder().with(input).withMessage(msgSupl).withValidation(validSupl);
         }
 
     }
