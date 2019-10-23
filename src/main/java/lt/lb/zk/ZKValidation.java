@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.caching.LazyDependantValue;
@@ -135,9 +136,9 @@ public class ZKValidation {
             return new ExternalValidationBuilder();
         }
 
-        private final Supplier<Component[]> component;
-        private final Supplier<Boolean> valid;
-        private final Supplier<String> message;
+        protected final Supplier<Component[]> component;
+        protected final Supplier<Boolean> valid;
+        protected final Supplier<String> message;
 
         public static ExternalValidation alwaysValid() {
             return builder().with(new Div()).withMessage("").withValidation(() -> true);
@@ -151,6 +152,10 @@ public class ZKValidation {
 
         public boolean isValid() {
             return valid.get();
+        }
+        
+        public boolean isEnabled(){
+            return Stream.of(component.get()).anyMatch(com -> com.isVisible());
         }
 
         public ExternalValidation addTo(ExternalValidator validator) {
@@ -281,7 +286,7 @@ public class ZKValidation {
 
             } else {
                 Constraint constraint = input.getConstraint();
-                
+
                 Value<WrongValueException> proxyConst = new Value<>();
                 exSupl = new LazyDependantValue<>(() -> {
                     input.getText();
@@ -302,7 +307,7 @@ public class ZKValidation {
 
             LazyDependantValue<String> msgSupl = exSupl.map(m -> m.map(ex -> ex.getMessage()).orElse(""));
             LazyDependantValue<Boolean> validLazySupl = exSupl.map(m -> !m.isPresent());
-            Supplier<Boolean> validSupl = ()->{
+            Supplier<Boolean> validSupl = () -> {
                 exSupl.invalidate();
                 return validLazySupl.get();
             };
@@ -328,19 +333,23 @@ public class ZKValidation {
     }
 
     public static boolean externalValidation(Collection<ExternalValidation> validations, boolean full) {
-        BooleanValue valid = new BooleanValue(true);
-        Map<Component, List<ExternalValidation>> map = new LinkedHashMap<>();
+        BooleanValue valid = BooleanValue.FALSE();
+        Map<Component, List<ExternalValidation>> map = new LinkedHashMap<>(); // order matters
         for (ExternalValidation v : validations) {
+            if (!v.isEnabled()) {
+                continue;
+            }
             Component[] get = v.component.get();
-            for (Component c : get) {
-                List<ExternalValidation> computeIfAbsent = map.computeIfAbsent(c, k -> new ArrayList<>());
-                computeIfAbsent.add(v);
+            for (Component c : get) { // can define more than 1 validation for a component
+                map.computeIfAbsent(c, k -> new ArrayList<>(1)).add(v);
             }
         }
         F.find(map, (comp, validationList) -> {
-            Optional<ExternalValidation> finalVal = F.find(validationList, (i, validation) -> !validation.isValid()).map(m -> m.g2);
+            //find first invalid validation
+            Optional<String> finalVal = F.find(validationList, (i, validation) -> !validation.isValid())
+                    .map(m -> m.g2.message.get());
             if (finalVal.isPresent()) { // invalid
-                _wrongValue(comp, finalVal.get().message.get());
+                _wrongValue(comp, finalVal.get());
                 valid.setFalse();
             } else {
                 _clearWrongValue(comp);
