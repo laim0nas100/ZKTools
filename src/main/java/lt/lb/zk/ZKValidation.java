@@ -46,6 +46,12 @@ public class ZKValidation {
         boolean staticComps = true;
         List<Supplier<? extends Component>> components = new ArrayList<>();
 
+        /**
+         * Add component array
+         *
+         * @param comps
+         * @return
+         */
         public ExternalValidationBuilder with(Component... comps) {
             for (Component c : comps) {
                 with(() -> c);
@@ -53,16 +59,34 @@ public class ZKValidation {
             return this;
         }
 
+        /**
+         * Add component that can change
+         *
+         * @param c
+         * @return
+         */
         public ExternalValidationBuilder with(Supplier<? extends Component> c) {
             components.add(c);
             staticComps = false;
             return this;
         }
 
+        /**
+         * Add static validation message
+         *
+         * @param str
+         * @return
+         */
         public ExternalValidationBuilder1 withMessage(String str) {
             return withMessage(() -> str);
         }
 
+        /**
+         * Add dynamic validation message
+         *
+         * @param str
+         * @return
+         */
         public ExternalValidationBuilder1 withMessage(Supplier<String> str) {
             if (this.components.isEmpty()) {
                 throw new IllegalArgumentException("No components specified");
@@ -86,6 +110,12 @@ public class ZKValidation {
         private ExternalValidationBuilder prev;
         private Supplier<String> msg;
 
+        /**
+         * Add validation supplier. True if condition is valid, false otherwise
+         *
+         * @param supp
+         * @return
+         */
         public ExternalValidation withValidation(Supplier<Boolean> supp) {
 
             ExternalValidation v = new ExternalValidation(supplier(this.prev), supp, msg);
@@ -95,6 +125,13 @@ public class ZKValidation {
             return v;
         }
 
+        /**
+         * Add validation that can be defined with a predicate, that receives
+         * array of defined components
+         *
+         * @param pred
+         * @return
+         */
         public ExternalValidation withValidation(Predicate<Component[]> pred) {
             Supplier<Component[]> supplier = supplier(this.prev);
             ExternalValidation v = new ExternalValidation(supplier, () -> pred.test(supplier.get()), msg);
@@ -104,6 +141,13 @@ public class ZKValidation {
             return v;
         }
 
+        /**
+         * With validation that can throw exceptions, but they are ignored and
+         * just treated as invalid
+         *
+         * @param supp
+         * @return
+         */
         public ExternalValidation withSafeValidation(UnsafeSupplier<Boolean> supp) {
             return withValidation(() -> {
                 try {
@@ -140,6 +184,10 @@ public class ZKValidation {
         protected final Supplier<Boolean> valid;
         protected final Supplier<String> message;
 
+        /**
+         *
+         * @return External validation that is always valid (like a placeholder)
+         */
         public static ExternalValidation alwaysValid() {
             return builder().with(new Div()).withMessage("").withValidation(() -> true);
         }
@@ -150,14 +198,24 @@ public class ZKValidation {
             message = msg;
         }
 
+        /**
+         *
+         * @return if this validation is valid
+         */
         public boolean isValid() {
             return valid.get();
         }
-        
-        public boolean isEnabled(){
+
+        public boolean isEnabled() {
             return Stream.of(component.get()).anyMatch(com -> com.isVisible());
         }
 
+        /**
+         * Adds current validation to given validator
+         *
+         * @param validator
+         * @return
+         */
         public ExternalValidation addTo(ExternalValidator validator) {
             validator.add(this);
             return this;
@@ -169,24 +227,54 @@ public class ZKValidation {
 
         private List<ExternalValidation> validations = new LinkedList<>();
 
+        /**
+         * Add validation to this validator
+         *
+         * @param extVal
+         * @return
+         */
         public ExternalValidator add(ExternalValidation extVal) {
             validations.add(extVal);
             return this;
         }
 
+        /**
+         * Construct a builder which produces a validation that gets added to
+         * this validator
+         *
+         * @return
+         */
         public ExternalValidationBuilder builder() {
             ExternalValidationBuilder b = new ExternalValidationBuilder();
             b.validator = this;
             return b;
         }
 
-        public ExternalValidator addRecursive(Component comp, boolean full) {
+        /**
+         * Recursively scan root component and supplement/replace every
+         * constraint with such that converts into ExternalValidation which then
+         * gets added to this validator
+         *
+         * @param comp root component
+         * @param replace if true, then every constraint will be replaced and
+         * will not work in old way (throwing exception) validation will only
+         * work if invoked via ExternalValidation, otherwise will work both ways
+         * (throws exception and via ExternalValidation)
+         * @return
+         */
+        public ExternalValidator addRecursive(Component comp, boolean replace) {
             ZKValidation.collectConstraints(t -> true, comp).stream()
-                    .map(ref -> ref.buildExternalValidation(true))
+                    .map(ref -> ref.buildExternalValidation(replace))
                     .forEach(this::add);
             return this;
         }
 
+        /**
+         * Combines validators into a new one
+         *
+         * @param other
+         * @return
+         */
         public ExternalValidator combine(ExternalValidator other) {
             ExternalValidator combined = new ExternalValidator();
             combined.validations.addAll(this.validations);
@@ -194,18 +282,42 @@ public class ZKValidation {
             return combined;
         }
 
+        /**
+         * Invoke validation
+         *
+         * @param full stopping policy
+         * @return
+         */
         public boolean isValid(boolean full) {
             return externalValidation(validations, full);
         }
 
+        /**
+         * Invoke validation {@link isValid(true)}
+         *
+         * @return
+         */
         public boolean isValid() {
             return isValid(true);
         }
 
+        /**
+         * Invoke validation {@link !isValid(full)} convenient for return
+         * conditions
+         *
+         * @param full stopping policy
+         * @return
+         */
         public boolean isInvalid(boolean full) {
             return !isValid(full);
         }
 
+        /**
+         * Invoke validation {@link !isValid(true)} convenient for return
+         * conditions
+         *
+         * @return
+         */
         public boolean isInvalid() {
             return !isValid(true);
         }
@@ -234,6 +346,11 @@ public class ZKValidation {
         comp.removeAttribute(WRONG_VALUE_KEY);
     }
 
+    /**
+     * Show wrong value on component or clean wrong value, depending if component was marked {@link 
+     * @param comp
+     * @return 
+     */
     public static boolean _markValidation(Component comp) {
         if (comp.hasAttribute(WRONG_VALUE_KEY)) {
             String msg = (String) comp.getAttribute(WRONG_VALUE_KEY);
@@ -272,7 +389,7 @@ public class ZKValidation {
             this.input = input;
         }
 
-        public ExternalValidation buildExternalValidation(boolean replace) {
+        private ExternalValidation buildExternalValidation(boolean replace) {
             LazyDependantValue<Optional<WrongValueException>> exSupl;
             if (!replace) {
                 exSupl = new LazyDependantValue<>(() -> {
