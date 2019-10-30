@@ -1,12 +1,9 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public interface DynamicRowDecorator {
     public void decorate(DynamicRow row);

@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 import java.util.ArrayList;

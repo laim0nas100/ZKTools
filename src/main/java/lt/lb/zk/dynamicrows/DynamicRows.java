@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ import org.zkoss.zul.Grid;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public class DynamicRows {
 

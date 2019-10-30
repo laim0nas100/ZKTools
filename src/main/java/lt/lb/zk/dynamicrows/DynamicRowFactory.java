@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 import java.util.Arrays;
@@ -9,9 +6,7 @@ import java.util.function.BiConsumer;
 import lt.lb.commons.F;
 import lt.lb.commons.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuples;
-import lt.lb.commons.parsing.StringOp;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Checkbox;
@@ -22,7 +17,7 @@ import org.zkoss.zul.impl.InputElement;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public interface DynamicRowFactory {
 

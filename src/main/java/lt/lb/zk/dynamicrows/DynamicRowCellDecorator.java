@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 import java.util.List;
@@ -10,7 +7,7 @@ import org.zkoss.zul.Cell;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public interface DynamicRowCellDecorator {
 

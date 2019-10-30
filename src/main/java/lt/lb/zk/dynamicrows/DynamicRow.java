@@ -1,6 +1,3 @@
-/*
- * Copyright @LKPB 
- */
 package lt.lb.zk.dynamicrows;
 
 import java.lang.reflect.Field;
@@ -65,7 +62,7 @@ import org.zkoss.zul.Vbox;
 
 /**
  *
- * @author Laimonas Beniušis
+ * @author laim0nas100
  */
 public class DynamicRow {
 
@@ -119,7 +116,19 @@ public class DynamicRow {
     private Set<String> tags = new HashSet<>();
     private boolean deleted;
 
-    private BiConsumer<Long, Long> updateListener = (oldTime, newTime) -> {
+    private ArrayList<RowRunDecor> runDecor = new ArrayList<>();
+
+    public static enum DecorType {
+        UPDATE, UI, VIEW, FORM
+    }
+
+    private void doRun(DecorType type, Runnable action) {
+        runDecor.stream().filter(f -> f.predicate.test(this))
+                .filter(f -> f.acceptableTypes.contains(type))
+                .forEach(c -> c.decorator.accept(action));
+    }
+
+    private BiConsumer<Long, Long> updateFinalListener = (oldTime, newTime) -> {
 //        Log.print("Update " + getKey());
         if (deleted) {
             return;
@@ -186,7 +195,7 @@ public class DynamicRow {
         this.cellTemplate = template;
 
         updater.bindPropogate(updateFinal);
-        updateFinal.addListener(updateListener);
+        updateFinal.addListener(updateFinalListener);
         disabled.addListener((b4, now) -> {
             if (!Objects.equals(b4, now)) {
                 disableDecorator.accept(now, this);
@@ -202,7 +211,7 @@ public class DynamicRow {
         updater.addListener(fireListeners -> {
             ExtComparator<Tuple<Integer, Consumer<DynamicRow>>> cmp = ExtComparator.ofValue(v -> v.g1);
             listeners.stream().sorted(cmp.reversed()).map(m -> m.g2).forEach(action -> {
-                action.accept(this);
+                doRun(DecorType.UPDATE, () -> action.accept(this));
             });
         });
         F.iterate(dec, (i, t) -> {
@@ -223,6 +232,8 @@ public class DynamicRow {
             });
 
         });
+        //add default decorator
+        this.runDecor.add(new RowRunDecor.RowRunDecorBuilder().withAllTypes().withDecorator(Runnable::run));
 
     }
 
@@ -379,7 +390,7 @@ public class DynamicRow {
                 vb.setAlign("left");
                 radioParent = vb;
                 radio.appendChild(vb);
-            }else{
+            } else {
                 radio.setOrient("horizontal");
                 radioParent = radio;
             }
@@ -488,10 +499,10 @@ public class DynamicRow {
         ui.proxy = proxy;
         ui.updateForm = Optional.ofNullable(updateForm);
         ui.updateUi = Optional.ofNullable(updateView);
-        this.formUpdatesList.add(() -> {
+        withFormUpdate(r -> {
             ui.updateForm();
         });
-        this.viewUpdatesList.add(() -> {
+        withViewUpdate(r -> {
             ui.updateUI();
         });
         return add(comp);
@@ -593,7 +604,9 @@ public class DynamicRow {
         if (deleted || !isVisible()) {
             return this;
         }
-        viewUpdatesList.forEach(Runnable::run);
+        viewUpdatesList.forEach(action -> {
+            doRun(DecorType.VIEW, () -> action.run());
+        });
         return update();
     }
 
@@ -602,7 +615,9 @@ public class DynamicRow {
             return this;
         }
 
-        formUpdatesList.forEach(Runnable::run);
+        formUpdatesList.forEach(action -> {
+            doRun(DecorType.FORM, () -> action.run());
+        });
         this.update();
         return this;
     }
@@ -640,12 +655,16 @@ public class DynamicRow {
 
     public DynamicRow addButton(String title, EventListener event) {
         Button but = new Button(title);
-        but.addEventListener(Events.ON_CLICK, event);
+        but.addEventListener(Events.ON_CLICK, e -> {
+            doRun(DecorType.UI, () -> F.unsafeRun(() -> event.onEvent(e)));
+        });
         return this.add(but);
     }
 
     public DynamicRow addButton(Button but, EventListener event) {
-        but.addEventListener(Events.ON_CLICK, event);
+        but.addEventListener(Events.ON_CLICK, e -> {
+            doRun(DecorType.UI, () -> F.unsafeRun(() -> event.onEvent(e)));
+        });
         return this.add(but);
     }
 
@@ -967,6 +986,11 @@ public class DynamicRow {
 
     public <T> DynamicRow withComponentTypeDecorator(Class<T> cls, BiConsumer<DynamicRow, Component> decorator) {
         this.decorators.put(cls, decorator);
+        return this;
+    }
+
+    public DynamicRow withRunDecor(RowRunDecor decor) {
+        this.runDecor.add(decor);
         return this;
     }
 
