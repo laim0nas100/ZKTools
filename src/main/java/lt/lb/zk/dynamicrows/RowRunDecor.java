@@ -44,7 +44,9 @@ public class RowRunDecor {
             object.decorator = cons;
             return object;
         }
-        
-        
+    }
+    
+    public static RowRunDecorBuilder builder(){
+        return new RowRunDecorBuilder();
     }
 }

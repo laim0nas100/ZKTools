@@ -123,9 +123,11 @@ public class DynamicRow {
     }
 
     private void doRun(DecorType type, Runnable action) {
-        runDecor.stream().filter(f -> f.predicate.test(this))
+        runDecor.stream()
+                .filter(f -> f.predicate.test(this))
                 .filter(f -> f.acceptableTypes.contains(type))
-                .forEach(c -> c.decorator.accept(action));
+                .reduce((a, b) -> a.compose(b))
+                .get().decorator.accept(action); //must be atleast one for every type
     }
 
     private BiConsumer<Long, Long> updateFinalListener = (oldTime, newTime) -> {
