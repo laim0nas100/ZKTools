@@ -450,7 +450,7 @@ public class ZKValidation {
     }
 
     public static boolean externalValidation(Collection<ExternalValidation> validations, boolean full) {
-        BooleanValue valid = BooleanValue.FALSE();
+        BooleanValue valid = BooleanValue.TRUE();
         Map<Component, List<ExternalValidation>> map = new LinkedHashMap<>(); // order matters
         for (ExternalValidation v : validations) {
             if (!v.isEnabled()) {
