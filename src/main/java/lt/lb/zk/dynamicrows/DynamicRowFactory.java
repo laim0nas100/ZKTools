@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import lt.lb.commons.F;
+import lt.lb.commons.LineStringBuilder;
 import lt.lb.commons.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuples;
 import org.zkoss.zk.ui.Component;
@@ -76,7 +77,13 @@ public interface DynamicRowFactory {
 
     public static Cell simpleCellTemplate() {
         Cell cellTemplate = new Cell();
-        cellTemplate.setStyle("margin: 5px");
+        LineStringBuilder sb = new LineStringBuilder(";\n");
+        sb
+                .appendLine("margin-top: 2px")
+                .appendLine("margin-right: 4px")
+                .appendLine("margin-bottom: 2px")
+                .appendLine("margin-left: 4px");
+        cellTemplate.setStyle(sb.toString());
 //        cellTemplate.setStyle("padding: 5px");
 //            cellTemplate.setHflex("min");
         cellTemplate.setVflex("min");
@@ -159,5 +166,4 @@ public interface DynamicRowFactory {
         };
     }
 
-    
 }

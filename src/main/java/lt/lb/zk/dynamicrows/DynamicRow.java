@@ -763,11 +763,7 @@ public class DynamicRow {
 
             @Override
             public Tuple<Cell, Component> getCurrent() {
-                if (totalIndex >= 0) {
-                    return Tuples.create(getCurrentCell(), getCurrentComp());
-                } else {
-                    return null;
-                }
+                return totalIndex >= 0 ? Tuples.create(getCurrentCell(), getCurrentComp()) : null;
             }
 
             @Override
