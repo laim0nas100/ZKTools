@@ -17,8 +17,8 @@ import org.zkoss.zul.Radiogroup;
  */
 public class RadioComboboxMapper<T> {
 
-    Combobox combo;
-    Radiogroup radio;
+    public Combobox combo;
+    public Radiogroup radio;
     private List<T> options = new ArrayList<>();
     private Function<T, String> nameMapper = str -> "" + str;
     private Function<T, String> nullMapper = str -> "";
