@@ -86,7 +86,10 @@ public class RadioComboboxMapper<T> {
 
     public RadioComboboxMapper<T> withNullOption(String toDisplay) {
         this.nullMapper = s -> toDisplay;
-        return withOption(null);
+        if (!options.contains(null)) {
+            options.add(0, null);
+        }
+        return this;
     }
 
     public RadioComboboxMapper<T> withReadOnly(boolean readonly) {
