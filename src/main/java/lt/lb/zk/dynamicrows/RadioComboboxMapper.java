@@ -21,6 +21,7 @@ public class RadioComboboxMapper<T> {
     Radiogroup radio;
     private List<T> options = new ArrayList<>();
     private Function<T, String> nameMapper = str -> "" + str;
+    private Function<T, String> nullMapper = str -> "";
     private boolean readOnly = true;
     private boolean isDisabled = false;
     private boolean isRadio = false;
@@ -35,9 +36,13 @@ public class RadioComboboxMapper<T> {
     public boolean isRadio() {
         return isRadio;
     }
-    
-    public boolean isVertical(){
+
+    public boolean isVertical() {
         return vertical;
+    }
+
+    public Function<T, String> mapper() {
+        return s -> s == null ? nullMapper.apply(s) : nameMapper.apply(s);
     }
 
     public Optional<T> getSelected() {
@@ -58,15 +63,15 @@ public class RadioComboboxMapper<T> {
 
     public List<String> getNames() {
         return options.stream()
-                .map(nameMapper)
+                .map(mapper())
                 .collect(Collectors.toList());
     }
 
     public boolean isReadOnly() {
         return readOnly;
     }
-    
-    public boolean isDisabled(){
+
+    public boolean isDisabled() {
         return isDisabled;
     }
 
@@ -77,6 +82,11 @@ public class RadioComboboxMapper<T> {
     public RadioComboboxMapper<T> withMapper(Function<T, String> mapper) {
         this.nameMapper = mapper;
         return this;
+    }
+
+    public RadioComboboxMapper<T> withNullOption(String toDisplay) {
+        this.nullMapper = s -> toDisplay;
+        return withOption(null);
     }
 
     public RadioComboboxMapper<T> withReadOnly(boolean readonly) {
@@ -91,8 +101,8 @@ public class RadioComboboxMapper<T> {
         });
         return this;
     }
-    
-    public RadioComboboxMapper<T> withVertical(boolean ver){
+
+    public RadioComboboxMapper<T> withVertical(boolean ver) {
         this.vertical = ver;
         return this;
     }
@@ -111,7 +121,7 @@ public class RadioComboboxMapper<T> {
         this.isRadio = b;
         return this;
     }
-    
+
     public RadioComboboxMapper<T> withDisabled(boolean b) {
         this.isDisabled = b;
         return this;
