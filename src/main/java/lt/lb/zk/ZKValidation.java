@@ -577,7 +577,7 @@ public class ZKValidation {
         public static Supplier<Boolean> validationNoFuture(Datebox elem, boolean nullTolerance) {
             return () -> SafeOpt.of(elem)
                     .map(m -> m.getValue())
-                    .map(m -> m.toInstant())
+                    .map(m -> Instant.ofEpochMilli(m.getTime()))
                     .map(m -> m.isBefore(Instant.now()))
                     .orElse(nullTolerance);
 
@@ -586,7 +586,7 @@ public class ZKValidation {
         public static Supplier<Boolean> validationNoPast(Datebox elem, boolean nullTolerance) {
             return () -> SafeOpt.of(elem)
                     .map(m -> m.getValue())
-                    .map(m -> m.toInstant())
+                    .map(m -> Instant.ofEpochMilli(m.getTime()))
                     .map(m -> m.isAfter(Instant.now()))
                     .orElse(nullTolerance);
         }

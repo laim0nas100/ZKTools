@@ -362,7 +362,12 @@ public class DynamicRow {
     }
 
     public DynamicRow addSpace() {
-        return this.add(new Space());
+        return addSpace("5px");
+    }
+    public DynamicRow addSpace(String spacing) {
+        Space s = new Space();
+        s.setSpacing(spacing);
+        return this.add(s);
     }
 
     public DynamicRow addLabel(String str) {

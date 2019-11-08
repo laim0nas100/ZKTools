@@ -30,19 +30,31 @@ public interface DynamicRowCellDecorator {
     }
 
     public static DynamicRowCellDecorator cellHflex(String... hflexes) {
-        return cellAny((opt, cell) -> {
+        return cellArray((opt, cell) -> {
             cell.setHflex(opt);
         }, hflexes);
     }
 
     public static DynamicRowCellDecorator cellAlign(String... aligns) {
-        return cellAny((opt, cell) -> {
+        return cellArray((opt, cell) -> {
             cell.setAlign(opt);
         }, aligns);
     }
+    
+    public static DynamicRowCellDecorator cellAlignAll(String align){
+        return cellAll((opt,cell)->{
+            cell.setAlign(opt);
+        }, align);
+    }
 
     public static DynamicRowCellDecorator cellWidth(String... widths) {
-        return cellAny((opt, cell) -> {
+        return cellArray((opt, cell) -> {
+            cell.setWidth(opt);
+        }, widths);
+    }
+    
+    public static DynamicRowCellDecorator cellWidthAll(String widths) {
+        return cellAll((opt, cell) -> {
             cell.setWidth(opt);
         }, widths);
     }
@@ -54,12 +66,24 @@ public interface DynamicRowCellDecorator {
             });
         };
     }
+    
+    public static DynamicRowCellDecorator cellRowSpanAll(Integer rowspan) {
+        return cellAll((opt, cell) -> {
+            cell.setRowspan(opt);
+        }, rowspan);
+    }
 
-    public static DynamicRowCellDecorator cellAny(BiConsumer<String, Cell> consumer, String... options) {
+    public static <T> DynamicRowCellDecorator cellArray(BiConsumer<T, Cell> consumer, T... options) {
         return (cells) -> {
             F.iterate(options, (i, option) -> {
                 consumer.accept(option, cells.get(i));
             });
+        };
+    }
+
+    public static <T> DynamicRowCellDecorator cellAll(BiConsumer<T, Cell> consumer, T option) {
+        return (cells) -> {
+            F.iterate(cells, (i, c) -> consumer.accept(option, c));
         };
     }
 }
