@@ -114,7 +114,8 @@ public interface DynamicRowFactory {
 //                throw new IllegalArgumentException("Style is unsupported in " + comp);
 //            }
 
-            int size = r.getCellCount();
+
+            int size = r.getComponentCount();
             for (int i = 0; i < size; i++) {
                 Component c = r.getComponent(i);
                 if (c instanceof Checkbox) {

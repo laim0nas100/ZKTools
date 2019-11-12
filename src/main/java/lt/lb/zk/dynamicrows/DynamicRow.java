@@ -752,7 +752,7 @@ public class DynamicRow {
     private ReadOnlyIterator<Tuple<Cell, Component>> mainIterator() {
         ArrayList<Cell> cellCopy = new ArrayList<>(cells.size());
         cells.forEach(cellCopy::add);
-        int total = cellCopy.stream().mapToInt(m -> m.getChildren().get(0).getChildren().size()).sum();
+        int total = getComponentCount();
         return new ReadOnlyIterator<Tuple<Cell, Component>>() {
             int cellIndex = 0;
             int compIndex = -1;
@@ -805,6 +805,14 @@ public class DynamicRow {
 
             }
         };
+    }
+    
+    public int getComponentCount(){
+        return cells.stream().mapToInt(m -> m.getChildren().get(0).getChildren().size()).sum();
+    }
+    
+    public List<Component> getComponents(){
+        return mainIterator().map(m->m.g2).toArrayList();
     }
 
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
