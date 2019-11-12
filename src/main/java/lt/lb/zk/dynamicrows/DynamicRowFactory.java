@@ -115,9 +115,7 @@ public interface DynamicRowFactory {
 //            }
 
 
-            int size = r.getComponentCount();
-            for (int i = 0; i < size; i++) {
-                Component c = r.getComponent(i);
+            for (Component c:r.getComponents()) {
                 if (c instanceof Checkbox) {
                     ((Checkbox) c).setDisabled(dis);
                 } else if (c instanceof InputElement) {
