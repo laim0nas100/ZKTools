@@ -207,6 +207,19 @@ public class DynamicRows {
 //        Log.printLines(list);
         return list;
     }
+    
+    public List<DynamicRow> getDynamicRowsInOrderNested(){
+        ArrayList<DynamicRow> all = new ArrayList<>();
+        this.getDynamicRowsAndRowsInOrder().forEach(r->{
+            if(r instanceof DynamicRow){
+                all.add(F.cast(r));
+            }else if(r instanceof DynamicRows){
+                DynamicRows dr = F.cast(r);
+                all.addAll(dr.getDynamicRowsInOrderNested());
+            }
+        });
+        return all;
+    }
 
     public void composeRows(Integer index, DynamicRows rows) {
 
