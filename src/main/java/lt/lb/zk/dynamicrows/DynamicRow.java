@@ -409,7 +409,7 @@ public class DynamicRow {
                 r.setDisabled(mapper.isDisabled());
             }
             mapper.radio = radio;
-            if (mapper.getPreselectedIndex() > 0) {
+            if (mapper.getPreselectedIndex() != -1) {
                 radio.setSelectedIndex(mapper.getPreselectedIndex());
             }
             if (updatesNotEmpty) {
@@ -425,7 +425,7 @@ public class DynamicRow {
             combo.setReadonly(mapper.isReadOnly());
             combo.setDisabled(mapper.isDisabled());
             mapper.combo = combo;
-            if (mapper.getPreselectedIndex() > 0) {
+            if (mapper.getPreselectedIndex() != -1) {
                 combo.setSelectedIndex(mapper.getPreselectedIndex());
             }
             combo.addEventListener(Events.ON_SELECT, l -> {
