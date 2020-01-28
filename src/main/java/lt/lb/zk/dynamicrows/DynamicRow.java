@@ -275,6 +275,20 @@ public class DynamicRow {
         }
 
     }
+    
+    public DynamicRow mergeLast(Supplier<? extends HtmlBasedComponent> enclosing, int lastCount){
+        int[] indexes = new int[lastCount];
+        int lastIndex = cells.size() - 1;
+        for(int i = 0; i < lastCount; i++){
+            int j = indexes.length - 1 - i;
+            indexes[j] = lastIndex;
+            lastIndex--;
+            
+        }
+        
+        return merge(enclosing, indexes);
+        
+    }
 
     public DynamicRow merge(Supplier<? extends HtmlBasedComponent> enclosing, int... comps) {
         if (comps.length <= 1) {// no op
@@ -290,7 +304,7 @@ public class DynamicRow {
             final int num = comps[i];
             Cell get = getCellSupplier(p -> p.g1 == num).get();
             if (get.getChildren().get(0).getChildren().size() != 1) {
-                throw new IllegalArgumentException("cmponent num:" + num + "is part of a merged cell, can only merge free cells");
+                throw new IllegalArgumentException("component num:" + num + "is part of a merged cell, can only merge free cells");
             }
         }
 
