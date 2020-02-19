@@ -1041,7 +1041,7 @@ public class DynamicRow {
     }
 
     public DynamicRow display() {
-        return display(false);
+        return display(true);
     }
 
     public boolean isDisabled() {
