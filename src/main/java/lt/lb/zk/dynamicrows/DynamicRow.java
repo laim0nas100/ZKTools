@@ -547,10 +547,12 @@ public class DynamicRow {
     public DynamicRow addBoundTextbox(Textbox box, ValueProxy<String> data) {
         BiConsumer<Component, Consumer> formUpdate = (comp, cons) -> {
             Textbox tb = F.cast(comp);
+            Log.print("Update form",tb,tb.getText());
             cons.accept(tb.getText());
         };
         BiConsumer<Supplier, Component> uiUpdate = (supp, comp) -> {
             Textbox tb = F.cast(comp);
+            Log.print("Update view",tb,tb.getText(),supp.get());
             tb.setText(F.cast(supp.get()));
         };
         return this.addBoundElement(() -> box, data, formUpdate, uiUpdate);
