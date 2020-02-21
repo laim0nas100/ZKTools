@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lt.lb.commons.SafeOpt;
+import lt.lb.commons.misc.IntRange;
+import lt.lb.commons.misc.Range;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Radiogroup;
 
@@ -43,6 +45,21 @@ public class RadioComboboxMapper<T> {
 
     public Function<T, String> mapper() {
         return s -> s == null ? nullMapper.apply(s) : nameMapper.apply(s);
+    }
+
+    public RadioComboboxMapper<T> selectIndex(int i) {
+        IntRange.of(0, options.size()).assertIndexBoundsExclusive(i);
+        if (isRadio()) {
+            SafeOpt.ofNullable(radio).ifPresent(b -> b.setSelectedIndex(i)).getError().throwIfErrorNested();
+        } else {
+            SafeOpt.ofNullable(combo).ifPresent(b -> b.setSelectedIndex(i)).getError().throwIfErrorNested();
+        }
+
+        return this;
+    }
+
+    public RadioComboboxMapper<T> select(T option) {
+        return selectIndex(options.indexOf(option));
     }
 
     public Optional<T> getSelected() {
