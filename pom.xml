@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>lt.lb</groupId>
     <artifactId>ZKTools</artifactId>
-    <version>1.0</version>
+    <version>local-jar</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -12,19 +12,19 @@
             <version>28.1-jre</version>
         </dependency>
         <dependency>
-            <groupId>lt.lb.commons</groupId>
+            <groupId>com.github.laim0nas100.Commons</groupId>
             <artifactId>commonslb-core</artifactId>
-            <version>local-jar</version>
+            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
         </dependency>
         <dependency>
-            <groupId>lt.lb.commons</groupId>
+            <groupId>com.github.laim0nas100.Commons</groupId>
             <artifactId>commonslb-log</artifactId>
-            <version>local-jar</version>
+            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
         </dependency>
         <dependency>
-            <groupId>lt.lb.commons</groupId>
+            <groupId>com.github.laim0nas100.Commons</groupId>
             <artifactId>commonslb-reflection</artifactId>
-            <version>local-jar</version>
+            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
         </dependency>
         <dependency>
             <groupId>org.zkoss.zk</groupId>
@@ -43,6 +43,11 @@
             <artifactId>zkbind</artifactId>
             <version>6.5.3</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
     </dependencies>
     <properties>
