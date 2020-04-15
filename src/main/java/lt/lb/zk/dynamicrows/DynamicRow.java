@@ -404,45 +404,16 @@ public class DynamicRow {
 
         boolean updatesNotEmpty = !mapper.getOnSelectionUpdate().isEmpty();
         if (mapper.isRadio()) {
-            Radiogroup radio = new Radiogroup();
-
-            Component radioParent;
-            if (mapper.isVertical()) {
-                Vbox vb = new Vbox();
-                vb.setAlign("left");
-                radioParent = vb;
-                radio.appendChild(vb);
-            } else {
-                radio.setOrient("horizontal");
-                radioParent = radio;
-            }
-
-            for (String item : mapper.getNames()) {
-                Radio r = new Radio(item);
-                radioParent.appendChild(r);
-                r.setRadiogroup(radio);
-                r.setDisabled(mapper.isDisabled());
-            }
+            
+            Radiogroup radio = mapper.generateRadio();
             mapper.radio = radio;
-            if (mapper.getPreselectedIndex() != -1) {
-                radio.setSelectedIndex(mapper.getPreselectedIndex());
-            }
             if (updatesNotEmpty) {
                 radio.addEventListener(Events.ON_SELECT, l -> {
                     this.update();
                 });
             }
         } else {
-            Combobox combo = new Combobox();
-            for (String item : mapper.getNames()) {
-                combo.appendItem(item);
-            }
-            combo.setReadonly(mapper.isReadOnly());
-            combo.setDisabled(mapper.isDisabled());
-            mapper.combo = combo;
-            if (mapper.getPreselectedIndex() != -1) {
-                combo.setSelectedIndex(mapper.getPreselectedIndex());
-            }
+            Combobox combo = mapper.generateCombobox();
             combo.addEventListener(Events.ON_SELECT, l -> {
                 this.update();
             });
@@ -548,6 +519,7 @@ public class DynamicRow {
         BiConsumer<Component, Consumer> formUpdate = (comp, cons) -> {
             Textbox tb = F.cast(comp);
             Log.print("Update form",tb,tb.getText());
+            
             cons.accept(tb.getText());
         };
         BiConsumer<Supplier, Component> uiUpdate = (supp, comp) -> {

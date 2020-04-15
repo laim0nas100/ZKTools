@@ -9,9 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.misc.IntRange;
-import lt.lb.commons.misc.Range;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
+import org.zkoss.zul.Vbox;
 
 /**
  *
@@ -158,6 +160,48 @@ public class RadioComboboxMapper<T> {
         }
         this.preselected = i;
         return this;
+    }
+
+    public Combobox generateCombobox() {
+        Combobox com = new Combobox();
+        for (String item : this.getNames()) {
+            com.appendItem(item);
+        }
+        com.setReadonly(this.isReadOnly());
+        com.setDisabled(this.isDisabled());
+        this.combo = com;
+        if (this.getPreselectedIndex() != -1) {
+            com.setSelectedIndex(this.getPreselectedIndex());
+        }
+        return com;
+    }
+
+    public Radiogroup generateRadio() {
+        Radiogroup rad = new Radiogroup();
+
+        Component radioParent;
+        if (this.isVertical()) {
+            Vbox vb = new Vbox();
+            vb.setAlign("left");
+            radioParent = vb;
+            rad.appendChild(vb);
+        } else {
+            rad.setOrient("horizontal");
+            radioParent = rad;
+        }
+
+        for (String item : this.getNames()) {
+            Radio r = new Radio(item);
+            radioParent.appendChild(r);
+            r.setRadiogroup(rad);
+            r.setDisabled(this.isDisabled());
+        }
+        this.radio = rad;
+        if (this.getPreselectedIndex() != -1) {
+            rad.setSelectedIndex(this.getPreselectedIndex());
+        }
+        
+        return rad;
     }
 
 }
