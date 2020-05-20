@@ -160,7 +160,7 @@ public class DynamicRows {
 
     public void removeAll() {
         composable.clear();
-        // in case we have so updaters configured
+        // in case we have some updaters configured
         rowMap.values().forEach(r -> r.markDeleted(true));
         rowMap.clear();
         keyOrder.clear();
@@ -207,13 +207,13 @@ public class DynamicRows {
 //        Log.printLines(list);
         return list;
     }
-    
-    public List<DynamicRow> getDynamicRowsInOrderNested(){
+
+    public List<DynamicRow> getDynamicRowsInOrderNested() {
         ArrayList<DynamicRow> all = new ArrayList<>();
-        this.getDynamicRowsAndRowsInOrder().forEach(r->{
-            if(r instanceof DynamicRow){
+        this.getDynamicRowsAndRowsInOrder().forEach(r -> {
+            if (r instanceof DynamicRow) {
                 all.add(F.cast(r));
-            }else if(r instanceof DynamicRows){
+            } else if (r instanceof DynamicRows) {
                 DynamicRows dr = F.cast(r);
                 all.addAll(dr.getDynamicRowsInOrderNested());
             }
@@ -221,7 +221,7 @@ public class DynamicRows {
         return all;
     }
 
-    public void composeRows(Integer index, DynamicRows rows) {
+    public DynamicRow composeRows(Integer index, DynamicRows rows) {
 
         if (composable.containsKey(rows.composableKey)) {
             throw new IllegalArgumentException(rows.composableKey + " is occupied");
@@ -236,10 +236,28 @@ public class DynamicRows {
         newRow.updateDependsOn(rows.updaterRow);
         newRow.add(rows.getRootComponent()).display();
         rows.parentSupplier = () -> this.getParentComponent();
+        
+        return newRow;
     }
 
-    public void composeRowsLast(DynamicRows rows) {
-        this.composeRows(-1, rows);
+    public void removeComposedRows(DynamicRows rows) {
+        if (!composable.containsKey(rows.composableKey)) {
+            throw new IllegalArgumentException(rows.composableKey + " is not found");
+        }
+        
+        DynamicRows get = this.composable.get(rows.composableKey);
+        if(get != rows){
+            throw new IllegalArgumentException("Composed rows reference missmatch");
+        }
+        this.composable.remove(rows.composableKey);
+        
+        
+        this.removeRow(rows.composableKey);
+        
+    }
+
+    public DynamicRow composeRowsLast(DynamicRows rows) {
+        return this.composeRows(-1, rows);
     }
 
     public Integer getRowIndex(String key) {

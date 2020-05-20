@@ -11,6 +11,16 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
+    <properties>
+        
+        <!--<commonslb.commit>410a2b8039c2abda61b65ce396fbbde97ca88fda</commonslb.commit>-->
+        <!--<commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>-->
+        <commonslb.commit>local-jar</commonslb.commit>
+        <commonslb.dir>lt.lb.commons</commonslb.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
     
     <dependencies>
         <dependency>
@@ -19,19 +29,19 @@
             <version>28.1-jre</version>
         </dependency>
         <dependency>
-            <groupId>com.github.laim0nas100.Commons</groupId>
+            <groupId>${commonslb.dir}</groupId>
             <artifactId>commonslb-core</artifactId>
-            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
+            <version>${commonslb.commit}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.laim0nas100.Commons</groupId>
+            <groupId>${commonslb.dir}</groupId>
             <artifactId>commonslb-log</artifactId>
-            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
+            <version>${commonslb.commit}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.laim0nas100.Commons</groupId>
+            <groupId>${commonslb.dir}</groupId>
             <artifactId>commonslb-reflection</artifactId>
-            <version>410a2b8039c2abda61b65ce396fbbde97ca88fda</version>
+            <version>${commonslb.commit}</version>
         </dependency>
         <dependency>
             <groupId>org.zkoss.zk</groupId>
@@ -57,11 +67,6 @@
             <version>3.9</version>
         </dependency>
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
     <build>
         <resources>
             <resource>

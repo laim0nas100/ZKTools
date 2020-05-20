@@ -1,2 +1,2 @@
 # ZKTools
-Various calsses to help work with ZK framework
+Various classes to help work with ZK framework

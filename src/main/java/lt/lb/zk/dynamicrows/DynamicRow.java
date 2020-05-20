@@ -275,20 +275,20 @@ public class DynamicRow {
         }
 
     }
-    
-    public DynamicRow mergeLast(Supplier<? extends HtmlBasedComponent> enclosing, int lastCount){
+
+    public DynamicRow mergeLast(Supplier<? extends HtmlBasedComponent> enclosing, int lastCount) {
         int[] indexes = new int[lastCount];
         int lastIndex = this.getComponentCount() - 1;
-        
-        for(int i = 0; i < lastCount; i++){
+
+        for (int i = 0; i < lastCount; i++) {
             int j = indexes.length - 1 - i;
             indexes[j] = lastIndex;
             lastIndex--;
-            
+
         }
-        
+
         return merge(enclosing, indexes);
-        
+
     }
 
     public DynamicRow merge(Supplier<? extends HtmlBasedComponent> enclosing, int... comps) {
@@ -379,6 +379,7 @@ public class DynamicRow {
     public DynamicRow addSpace() {
         return addSpace("5px");
     }
+
     public DynamicRow addSpace(String spacing) {
         Space s = new Space();
         s.setSpacing(spacing);
@@ -402,26 +403,24 @@ public class DynamicRow {
 
     public <T> DynamicRow addRadioCombobox(RadioComboboxMapper<T> mapper) {
 
-        boolean updatesNotEmpty = !mapper.getOnSelectionUpdate().isEmpty();
+        boolean updatesEmpty = mapper.getOnSelectionUpdate().isEmpty();
         if (mapper.isRadio()) {
-            
+
             Radiogroup radio = mapper.generateRadio();
             mapper.radio = radio;
-            if (updatesNotEmpty) {
+            if (!updatesEmpty) {
                 radio.addEventListener(Events.ON_SELECT, l -> {
-                    this.update();
+                    mapper.getOnSelectionUpdate().forEach(Runnable::run);
                 });
             }
         } else {
             Combobox combo = mapper.generateCombobox();
-            combo.addEventListener(Events.ON_SELECT, l -> {
-                this.update();
-            });
-        }
-        if (updatesNotEmpty) {
-            this.withUpdateListener(r -> {
-                mapper.getOnSelectionUpdate().forEach(Runnable::run);
-            });
+            if (!updatesEmpty) {
+                combo.addEventListener(Events.ON_SELECT, l -> {
+                    mapper.getOnSelectionUpdate().forEach(Runnable::run);
+                });
+            }
+
         }
 
         return mapper.isRadio() ? this.add(mapper.radio) : this.add(mapper.combo);
@@ -518,13 +517,13 @@ public class DynamicRow {
     public DynamicRow addBoundTextbox(Textbox box, ValueProxy<String> data) {
         BiConsumer<Component, Consumer> formUpdate = (comp, cons) -> {
             Textbox tb = F.cast(comp);
-            Log.print("Update form",tb,tb.getText());
-            
+            Log.print("Update form", tb, tb.getText());
+
             cons.accept(tb.getText());
         };
         BiConsumer<Supplier, Component> uiUpdate = (supp, comp) -> {
             Textbox tb = F.cast(comp);
-            Log.print("Update view",tb,tb.getText(),supp.get());
+            Log.print("Update view", tb, tb.getText(), supp.get());
             tb.setText(F.cast(supp.get()));
         };
         return this.addBoundElement(() -> box, data, formUpdate, uiUpdate);
@@ -567,11 +566,13 @@ public class DynamicRow {
     public DynamicRow addBoundDatebox(Datebox box, ValueProxy<Date> data) {
         BiConsumer<Component, Consumer> formUpdate = (comp, cons) -> {
             Datebox datebox = F.cast(comp);
-            cons.accept(datebox.getValue());
+            Date value = datebox.getValue();
+            cons.accept(value);
         };
         BiConsumer<Supplier, Component> uiUpdate = (supp, comp) -> {
             Datebox datebox = F.cast(comp);
-            datebox.setValue(F.cast(supp.get()));
+            Date value = F.cast(supp.get());
+            datebox.setValue(value);
         };
         return this.addBoundElement(() -> box, data, formUpdate, uiUpdate);
     }
@@ -795,13 +796,13 @@ public class DynamicRow {
             }
         };
     }
-    
-    public int getComponentCount(){
+
+    public int getComponentCount() {
         return cells.stream().mapToInt(m -> m.getChildren().get(0).getChildren().size()).sum();
     }
-    
-    public List<Component> getComponents(){
-        return mainIterator().map(m->m.g2).toArrayList();
+
+    public List<Component> getComponents() {
+        return mainIterator().map(m -> m.g2).toArrayList();
     }
 
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
