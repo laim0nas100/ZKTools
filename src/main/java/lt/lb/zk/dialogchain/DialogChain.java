@@ -76,6 +76,10 @@ public class DialogChain {
     public void thenDelegated(UnsafeConsumer<UnsafeRunnable> construction, UnsafeRunnable continuation) throws Exception {
         construction.accept(continuation);
     }
+    
+    public void thenDelegated(UnsafeRunnable construction) throws Exception {
+        construction.run();
+    }
 
     public static DialogChain start(Component comp) {
         return new DialogChain(comp);

@@ -16,7 +16,7 @@ public class DialogResult<INFO> {
     public DialogResult(DialogDTO<INFO> info, DialogExit exit) {
         this.future = Objects.requireNonNull(info);
         this.exit = exit;
-        this.earlyExit = !exit.disposeDialog;
+        this.earlyExit = exit.disposeDialog;
     }
 
     public DialogResult(DialogExit exit) {
