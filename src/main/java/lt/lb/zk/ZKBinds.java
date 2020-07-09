@@ -7,7 +7,6 @@ import java.util.Set;
 import lt.lb.commons.ArrayOp;
 import lt.lb.commons.F;
 import lt.lb.commons.Ins;
-import lt.lb.commons.Log;
 import lt.lb.commons.reflect.FieldChain;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
@@ -59,15 +58,12 @@ public class ZKBinds {
         @Override
         public void call(InputElement comp, FieldChain.ObjectFieldChain field, Object object) throws Exception {
             field.doSet(object, comp.getRawValue());
-            Log.print("set " + Arrays.asList(field.getPath()) + " from UI");
         }
 
         @Override
         public void updateUI(InputElement comp, FieldChain.ObjectFieldChain field, Object object) throws Exception {
             Object doGet = field.doGet(object);
             comp.setRawValue(doGet);
-            Log.print("update ui " + Arrays.asList(field.getPath()), comp, object);
-
         }
     };
 
@@ -80,15 +76,12 @@ public class ZKBinds {
         @Override
         public void call(Checkbox comp, FieldChain.ObjectFieldChain field, Object object) throws Exception {
             field.doSet(object, comp.isChecked());
-            Log.print("set " + Arrays.asList(field.getPath()) + " from UI");
         }
 
         @Override
         public void updateUI(Checkbox comp, FieldChain.ObjectFieldChain field, Object object) throws Exception {
             Boolean doGet = (Boolean) field.doGet(object);
             comp.setChecked(doGet);
-
-            Log.print("update ui checkbox " + Arrays.asList(field.getPath()), comp, object);
         }
     };
 
