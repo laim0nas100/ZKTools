@@ -143,7 +143,7 @@ public class ZKBinds {
             Set<Class> componentClasses = componentMap.keySet();
             if (componentClasses.contains(elemClass)) {
                 Class[] possibleTypes = componentMap.get(elemClass);
-                if (Ins.ofNullable(fieldType).instanceOfAny(possibleTypes)) {
+                if (insF.instanceOfAny(possibleTypes)) {
                     doBindWithCallback(element, field, object, callback, init);
                     return;
                 }
