@@ -21,11 +21,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lt.lb.commons.BindingValue;
+import lt.lb.commons.containers.values.BindingValue;
 import lt.lb.commons.F;
 import lt.lb.commons.Java;
 import lt.lb.commons.Log;
-import lt.lb.commons.ReflectionUtils;
+import lt.lb.commons.misc.ReflectionUtils;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.containers.tuples.Tuples;
 import lt.lb.commons.containers.values.ValueProxy;
@@ -882,7 +882,7 @@ public class DynamicRow {
     }
 
     /**
-     * Only if false, then hide me as well
+     * Only if false, then hide other as well
      *
      * @param other
      * @return

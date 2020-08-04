@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lt.lb.commons.F;
 import lt.lb.commons.Log;
-import lt.lb.commons.UUIDgenerator;
+import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.caching.LazyDependantValue;
 import lt.lb.commons.misc.ExtComparator;
 import org.zkoss.zk.ui.Component;

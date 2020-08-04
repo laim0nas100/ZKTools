@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
-import lt.lb.commons.UUIDgenerator;
+import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuples;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;

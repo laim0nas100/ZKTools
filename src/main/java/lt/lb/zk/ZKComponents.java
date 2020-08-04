@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
-import lt.lb.commons.UUIDgenerator;
+import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.misc.Range;
 import lt.lb.zk.Builder.EagerBuilder;
