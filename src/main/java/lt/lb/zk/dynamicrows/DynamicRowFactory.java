@@ -79,10 +79,10 @@ public interface DynamicRowFactory {
         Cell cellTemplate = new Cell();
         LineStringBuilder sb = new LineStringBuilder(";\n");
         sb
-                .appendLine("margin-top: 2px")
-                .appendLine("margin-right: 4px")
-                .appendLine("margin-bottom: 2px")
-                .appendLine("margin-left: 4px");
+                .appendLine("margin-top: 1px")
+                .appendLine("margin-right: 3px")
+                .appendLine("margin-bottom: 1px")
+                .appendLine("margin-left: 3px");
         cellTemplate.setStyle(sb.toString());
 //        cellTemplate.setStyle("padding: 5px");
 //            cellTemplate.setHflex("min");
