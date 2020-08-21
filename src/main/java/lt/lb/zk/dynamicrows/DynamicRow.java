@@ -794,6 +794,11 @@ public class DynamicRow {
                 }
 
             }
+
+            @Override
+            public void close() {
+            }
+            
         };
     }
 
