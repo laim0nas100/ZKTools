@@ -180,9 +180,9 @@ public class ZKValidation {
             return new ExternalValidationBuilder();
         }
 
-        protected final Supplier<Component[]> component;
-        protected final Supplier<Boolean> valid;
-        protected final Supplier<String> message;
+        public final Supplier<Component[]> component;
+        public final Supplier<Boolean> valid;
+        public final Supplier<String> message;
 
         /**
          *
