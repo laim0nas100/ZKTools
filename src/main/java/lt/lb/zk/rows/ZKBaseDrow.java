@@ -17,46 +17,54 @@ import org.zkoss.zul.Space;
  *
  */
 public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseDrows<R, DR>> extends SyncDrow<ZKCell, Component, ZKLine<R, DR>, ZKUpdates, ZKBaseDrowConf<R, DR>, R> {
-
+    
     public ZKBaseDrow(ZKLine line, ZKBaseDrowConf<R, DR> config, String key) {
         super(line, config, key);
     }
-
+    
     public R add(Supplier<Component> sup) {
         return this.add(sup.get());
     }
-
+    
     public R addSpace() {
         return addSpace("1px");
     }
-
+    
     public R addSpace(String spacing) {
         Space s = new Space();
         s.setSpacing(spacing);
         return this.add(s);
     }
-
+    
     public R addLabel(String str) {
         Label label = new Label(str);
         return add(label);
     }
-
+    
+    public R withPreferedAllign(String... aligns) {
+        return addOnDisplayAndRunIfDone(() -> {
+            F.iterate(aligns, (i, align) -> {
+                getCell(i).setAllign(align);
+            });
+        });
+    }
+    
     public <N extends Component> R addZKSync(ZKSync<?, ?, N> sync) {
         for (Component c : sync.nodes) {
             add(c);
         }
         return addDataSyncValidation(sync);
     }
-
+    
     public R addLabelWithUpdate(Supplier<String> stringSupplier) {
         Label label = new Label();
         this.add(label);
-
+        
         return this.withUpdateRefresh(r -> {
             label.setValue(stringSupplier.get());
         });
     }
-
+    
     public R addButton(String title, Consumer<ZKBaseDrow> event) {
         Button but = new Button(title);
         but.addEventListener(Events.ON_CLICK, e -> {
@@ -64,12 +72,12 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
         });
         return this.add(but);
     }
-
+    
     public R addButton(Button but, Consumer<ZKBaseDrow> event) {
         but.addEventListener(Events.ON_CLICK, e -> {
             event.accept(me());
         });
         return this.add(but);
     }
-
+    
 }
