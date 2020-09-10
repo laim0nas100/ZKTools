@@ -1,7 +1,15 @@
 package lt.lb.zk.rows;
 
+import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.ValueProxy;
@@ -10,9 +18,16 @@ import lt.lb.commons.func.Converter;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
+import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Longbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.impl.InputElement;
@@ -106,6 +121,147 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         });
         return sync;
 
+    }
+
+    public static <T extends Enum<T>> ZKSync<T, T, Combobox> ofComboBox(Combobox box, ValueProxy<T> selectedItem, Class<T> cls, Function<T, String> textExtract) {
+        List<T> options = new ArrayList<>(EnumSet.allOf(cls));
+        return ofComboBox(box, selectedItem, options, textExtract);
+    }
+
+    public static interface ListitemRenderInfoRenderer<T> extends ListitemRenderer<T> {
+
+        @Override
+        public default void render(Listitem item, T data, int index) throws Exception {
+            render(new ListitemRenderInfo<>(item, data, index));
+        }
+
+        public void render(ListitemRenderInfo<T> info) throws Exception;
+
+    }
+
+    public static interface ComboitemRenderInfoRenderer<T> extends ComboitemRenderer<T> {
+
+        @Override
+        public default void render(Comboitem item, T data, int index) throws Exception {
+            render(new ComboitemRenderInfo<>(item, data, index));
+        }
+
+        public void render(ComboitemRenderInfo<T> info) throws Exception;
+
+    }
+
+    public static class ListitemRenderInfo<T> {
+
+        public final Listitem item;
+        public final T data;
+        public final int index;
+
+        public ListitemRenderInfo(Listitem item, T data, int index) {
+            this.item = item;
+            this.data = data;
+            this.index = index;
+        }
+
+    }
+
+    public static class ComboitemRenderInfo<T> {
+
+        public final Comboitem item;
+        public final T data;
+        public final int index;
+
+        public ComboitemRenderInfo(Comboitem item, T data, int index) {
+            this.item = item;
+            this.data = data;
+            this.index = index;
+        }
+
+    }
+
+    public static <T> ZKSync<Collection<T>, Set<Listitem>, Listbox> ofListboxSelect(ValueProxy<Collection<T>> items, List<T> options, ListitemRenderInfoRenderer<T> renderer) {
+        return ofListboxSelect(new Listbox(), items, options, renderer);
+    }
+
+    public static <T> ZKSync<Collection<T>, Set<Listitem>, Listbox> ofListboxSelect(Listbox box, ValueProxy<Collection<T>> items, List<T> options, ListitemRenderInfoRenderer<T> renderer) {
+
+        ZKSync<Collection<T>, Set<Listitem>, Listbox> sync = new ZKSync<>(box);
+
+        sync.withIdentityPersist();
+
+        sync.withPersistProxy(items);
+        sync.withDisplaySup(() -> box.getSelectedItems());
+        sync.withDisplaySync(supl -> {
+            box.setSelectedItems(supl);
+        });
+        sync.withDisplayGet(obList -> {
+            return obList.stream().filter(m -> m.isSelected()).map(m -> (T) m.getValue()).collect(Collectors.toList());
+        });
+        sync.withDisplaySet(val -> {
+            HashSet<T> set = Sets.newHashSet(val);
+            return box.getItems().stream().filter(f -> set.contains((T) f.getValue())).collect(Collectors.toSet());
+        });
+        box.setItemRenderer(renderer);
+        box.addEventListener(Events.ON_CHANGE, ev -> {
+            sync.syncManagedFromDisplay();
+        });
+        box.setModel(new ListModelList<>(options));
+
+        return sync;
+    }
+
+    public static <T> ZKSync<Collection<T>, ListModelList<T>, Listbox> ofListbox(Listbox box, ValueProxy<Collection<T>> items, ListitemRenderInfoRenderer<T> renderer) {
+
+        ZKSync<Collection<T>, ListModelList<T>, Listbox> sync = new ZKSync<>(box);
+
+        sync.withIdentityPersist();
+
+        sync.withPersistProxy(items);
+        sync.withDisplaySup(() -> F.cast(box.getListModel()));
+        sync.withDisplaySync(supl -> {
+            box.setModel(supl);
+        });
+        sync.withDisplayGet(obList -> {
+            return obList.stream().collect(Collectors.toList());
+        });
+        sync.withDisplaySet(val -> {
+            return new ListModelList<>(val);
+        });
+        box.setItemRenderer(renderer);
+        box.addEventListener(Events.ON_CHANGE, ev -> {
+            sync.syncManagedFromDisplay();
+        });
+
+        return sync;
+    }
+
+    public static <T> ZKSync<T, T, Combobox> ofComboBox(Combobox box, ValueProxy<T> selectedItem, List<T> options, Function<T, String> textExtract) {
+        return ofComboBox(box, selectedItem, options, info -> {
+            info.item.setLabel(textExtract.apply(info.data));
+        });
+    }
+
+    public static <T> ZKSync<T, T, Combobox> ofComboBox(Combobox box, ValueProxy<T> selectedItem, List<T> options, ComboitemRenderInfoRenderer<T> renderer) {
+
+        ZKSync<T, T, Combobox> sync = new ZKSync<>(box);
+
+        sync.withPersistProxy(selectedItem);
+        sync.withIdentityPersist();
+        sync.withIdentityDisplay();
+        box.setAutocomplete(true);
+        box.setAutodrop(true);
+        sync.withDisplaySup(() -> {
+            return SafeOpt.of(box).map(m -> m.getSelectedItem()).map(m -> (T)m.getValue()).orElse(null);
+        });
+        sync.withDisplaySync(supl -> {
+            box.setSelectedIndex(options.indexOf(supl));
+        });
+        box.setItemRenderer(renderer);
+        box.setModel(new ListModelList<>(options));
+        box.addEventListener(Events.ON_CHANGE, ev -> {
+            sync.syncManagedFromDisplay();
+        });
+
+        return sync;
     }
 
 }

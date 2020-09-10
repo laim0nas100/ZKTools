@@ -3,6 +3,7 @@ package lt.lb.zk.rows;
 import lt.lb.zk.rows.ZKSync;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import lt.lb.commons.F;
 import lt.lb.commons.rows.SyncDrow;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
@@ -13,15 +14,14 @@ import org.zkoss.zul.Space;
 /**
  *
  * Base ZK row to extend and add new methods
- * 
+ *
  */
-public abstract class ZKBaseDrow<R extends ZKBaseDrow, DR extends ZKBaseDrows<R,DR>> extends SyncDrow<ZKCell, Component, ZKLine<R,DR>, ZKUpdates, ZKBaseDrowConf<R, DR>, R> {
+public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseDrows<R, DR>> extends SyncDrow<ZKCell, Component, ZKLine<R, DR>, ZKUpdates, ZKBaseDrowConf<R, DR>, R> {
 
     public ZKBaseDrow(ZKLine line, ZKBaseDrowConf<R, DR> config, String key) {
         super(line, config, key);
     }
 
-    
     public R add(Supplier<Component> sup) {
         return this.add(sup.get());
     }
@@ -40,14 +40,14 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow, DR extends ZKBaseDrows<R,
         Label label = new Label(str);
         return add(label);
     }
-    
-    public <N extends Component> R addZKSync(ZKSync<?,?,N> sync){
-        for(Component c:sync.nodes){
+
+    public <N extends Component> R addZKSync(ZKSync<?, ?, N> sync) {
+        for (Component c : sync.nodes) {
             add(c);
         }
         return addDataSyncValidation(sync);
     }
-    
+
     public R addLabelWithUpdate(Supplier<String> stringSupplier) {
         Label label = new Label();
         this.add(label);
@@ -55,9 +55,8 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow, DR extends ZKBaseDrows<R,
         return this.withUpdateRefresh(r -> {
             label.setValue(stringSupplier.get());
         });
-
     }
-    
+
     public R addButton(String title, Consumer<ZKBaseDrow> event) {
         Button but = new Button(title);
         but.addEventListener(Events.ON_CLICK, e -> {
@@ -73,5 +72,4 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow, DR extends ZKBaseDrows<R,
         return this.add(but);
     }
 
-    
 }
