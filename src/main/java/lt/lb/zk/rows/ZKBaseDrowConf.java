@@ -1,6 +1,5 @@
 package lt.lb.zk.rows;
 
-import lt.lb.zk.rows.ZKValid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -10,17 +9,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lt.lb.commons.F;
 import lt.lb.commons.Ins;
-import lt.lb.commons.Log;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.datasync.Valid;
 import lt.lb.commons.rows.base.BaseDrowSyncConf;
-import lt.lb.zk.ZKValidation;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Hlayout;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 
@@ -34,7 +29,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     
     public ZKBaseDrowConf() {
         withComponentDecorator(Textbox.class, c -> c.setHflex("1"));
-        withComponentDecorator(Button.class, c->c.setMold("trendy"));
+        withComponentDecorator(Button.class, c -> c.setMold("trendy"));
     }
     
     @Override
@@ -71,7 +66,6 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         }
         
         Integer rowIndex = rows.getVisibleRowIndex(row.getKey());
-        Log.print("Render rowIndex " + rowIndex, " key", row.getKey());
         if (rowIndex == -1) {
             throw new IllegalArgumentException(row.getKey() + " was not in " + rows.getComposableKey());
         }
@@ -87,7 +81,9 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
                 Cell cell = zkCell.getCell();
                 cell.getChildren().clear();
                 cell.setColspan(zkCell.getColSpan());
+                cell.setAlign(zkCell.getAllign());
                 cell.appendChild(enclosed);
+                
                 line.getRenderedNodes().add(cell);
                 line.row.appendChild(cell);
             } else {

@@ -10,11 +10,19 @@ import org.zkoss.zul.Cell;
  */
 public class ZKCell extends BaseCell<Component, Component> {
     protected Cell cell = new Cell();
-
+    
+    protected String allign;
+    
     public ZKCell() {
     }
 
-    
+    public String getAllign() {
+        return allign;
+    }
+
+    public void setAllign(String allign) {
+        this.allign = allign;
+    }
     
     public Cell getCell() {
         return cell;

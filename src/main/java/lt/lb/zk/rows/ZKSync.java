@@ -220,6 +220,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         sync.withDisplaySync(supl -> {
             box.setModel(supl);
         });
+        
         sync.withDisplayGet(obList -> {
             return obList.stream().collect(Collectors.toList());
         });
