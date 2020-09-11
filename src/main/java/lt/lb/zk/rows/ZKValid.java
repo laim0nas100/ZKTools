@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lt.lb.commons.datasync.NodeValid;
+import lt.lb.commons.datasync.base.NodeValid;
 import lt.lb.zk.ZKValidation.ExternalValidation;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.util.Clients;

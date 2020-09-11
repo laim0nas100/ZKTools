@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.ValueProxy;
-import lt.lb.commons.datasync.NodeSync;
+import lt.lb.commons.datasync.base.NodeSync;
 import lt.lb.commons.func.Converter;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
@@ -57,7 +57,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         SafeOpt<T> defaultSafe = SafeOpt.ofNullable(def);
         sync.withIdentityPersist();
         sync.withDisplayGet(str -> conv.getBackFrom(str).orElse(def));
-        sync.withDisplaySet(val -> conv.getFrom(SafeOpt.ofNullable(val).orSafe(() -> defaultSafe)));
+        sync.withDisplaySet(val -> conv.getFrom(SafeOpt.ofNullable(val).or(() -> defaultSafe)));
         sync.withDisplayProxy(ZKDataSync.quickProxy(tb::getValue, tb::setValue));
         sync.withPersistProxy(persistProxy);
 
