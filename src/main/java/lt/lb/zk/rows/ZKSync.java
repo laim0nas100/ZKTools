@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,10 +55,9 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
     public static <T> ZKSync<T, String, Textbox> ofTextboxFormatted(ValueProxy<T> persistProxy, Textbox tb, T def, Converter<SafeOpt<T>, String> conv) {
 
         ZKSync<T, String, Textbox> sync = new ZKSync<>(tb);
-        SafeOpt<T> defaultSafe = SafeOpt.ofNullable(def);
         sync.withIdentityPersist();
         sync.withDisplayGet(str -> conv.getBackFrom(str).orElse(def));
-        sync.withDisplaySet(val -> conv.getFrom(SafeOpt.ofNullable(val).or(() -> defaultSafe)));
+        sync.withDisplaySet(val -> conv.getFrom(SafeOpt.ofNullable(val).orGet(() -> def)));
         sync.withDisplayProxy(ZKDataSync.quickProxy(tb::getValue, tb::setValue));
         sync.withPersistProxy(persistProxy);
 
@@ -220,7 +220,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         sync.withDisplaySync(supl -> {
             box.setModel(supl);
         });
-        
+
         sync.withDisplayGet(obList -> {
             return obList.stream().collect(Collectors.toList());
         });
@@ -251,7 +251,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         box.setAutocomplete(true);
         box.setAutodrop(true);
         sync.withDisplaySup(() -> {
-            return SafeOpt.of(box).map(m -> m.getSelectedItem()).map(m -> (T)m.getValue()).orElse(null);
+            return SafeOpt.of(box).map(m -> m.getSelectedItem()).map(m -> (T) m.getValue()).orElse(null);
         });
         sync.withDisplaySync(supl -> {
             box.setSelectedIndex(options.indexOf(supl));
