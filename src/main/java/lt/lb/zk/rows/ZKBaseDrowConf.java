@@ -127,7 +127,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
 
     protected void conditionalAlligment(ZKLine<R, DR> line, int index, String align) {
 
-        if (StringOp.isEmpty(line.getCells().get(index).getAllign())) {
+        if (StringOp.isNotEmpty(line.getCells().get(index).getAllign())) { // somehting is defined, dont use default
             return;
         }
         SafeOpt.of(line.getRenderedNodes())
