@@ -3,6 +3,7 @@ package lt.lb.zk.builder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.Props;
 
 /**
@@ -23,6 +24,9 @@ public class Prop<T> extends Props.PropGet<String> {
         return optional;
     }
     
+    public SafeOpt<Prop<T>> getSafe(){
+        return SafeOpt.of(this);
+    }
     
     public boolean getBool() {
         return Boolean.parseBoolean(get(props));
