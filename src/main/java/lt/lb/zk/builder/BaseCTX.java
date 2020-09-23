@@ -26,6 +26,7 @@ public abstract class BaseCTX implements CTX {
     public void add(Prop... props) {
         for (Prop p : props) {
             properties.add(p);
+            p.props = data;
         }
     }
 
