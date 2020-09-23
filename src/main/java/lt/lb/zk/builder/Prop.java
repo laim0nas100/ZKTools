@@ -20,6 +20,11 @@ public class Prop<T> extends Props.PropGet<String> {
         return defaultVal;
     }
     
+    public void set(Object obj){
+        String string = obj == null ? null : String.valueOf(obj);
+        insert(props, string);
+    }
+    
     public boolean isOptional(){
         return optional;
     }
