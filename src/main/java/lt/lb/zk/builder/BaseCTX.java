@@ -8,7 +8,7 @@ import lt.lb.commons.containers.values.Props;
  *
  * @author laim0nas100
  */
-public abstract class BaseDRCTX implements DRCTX {
+public abstract class BaseCTX implements CTX {
 
     protected ArrayList<Prop> properties = new ArrayList<>();
     protected Props data = new Props();

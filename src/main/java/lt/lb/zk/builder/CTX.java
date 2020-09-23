@@ -12,7 +12,7 @@ import lt.lb.commons.containers.values.Props;
  *
  * @author laim0nas100
  */
-public interface DRCTX {
+public interface CTX {
 
     public List<Prop> getProperties();
 
