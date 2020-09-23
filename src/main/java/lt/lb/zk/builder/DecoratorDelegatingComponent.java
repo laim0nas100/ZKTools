@@ -32,7 +32,6 @@ public abstract class DecoratorDelegatingComponent extends HtmlMacroComponent {
         final Props props = ctx.getData();
         for (Prop prop : ctx.getProperties()) {
             String k = prop.propKey;
-            prop.props = props;
             if (!hasDynamicProperty(k)) {
                 if (!prop.optional) {
                     throw new IllegalArgumentException("no required property: " + k);
