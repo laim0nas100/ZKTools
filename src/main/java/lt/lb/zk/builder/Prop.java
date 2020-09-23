@@ -11,9 +11,19 @@ import lt.lb.commons.containers.values.Props;
  */
 public class Prop<T> extends Props.PropGet<String> {
 
+    public T defaultVal;
     public boolean optional;
     public Props props;
 
+    public T getDefault(){
+        return defaultVal;
+    }
+    
+    public boolean isOptional(){
+        return optional;
+    }
+    
+    
     public boolean getBool() {
         return Boolean.parseBoolean(get(props));
     }
