@@ -1,14 +1,30 @@
 package lt.lb.zk.rows;
 
+import java.util.Collection;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lt.lb.zk.rows.ZKSync;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lt.lb.commons.F;
+import lt.lb.commons.misc.NestedException;
 import lt.lb.commons.rows.SyncDrow;
+import lt.lb.zk.ZKValidation;
+import lt.lb.zk.dynamicrows.RadioComboboxMapper;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listhead;
+import org.zkoss.zul.ListitemRenderer;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Space;
 
 /**
@@ -72,17 +88,110 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
 
     public R addButton(String title, Consumer<ZKBaseDrow> event) {
         Button but = new Button(title);
-        but.addEventListener(Events.ON_CLICK, e -> {
-            event.accept(me());
-        });
-        return this.add(but);
+
+        return addButton(but, event);
     }
 
     public R addButton(Button but, Consumer<ZKBaseDrow> event) {
+        AtomicBoolean pressed = new AtomicBoolean(false);
         but.addEventListener(Events.ON_CLICK, e -> {
-            event.accept(me());
+            if (pressed.compareAndSet(false, true)) {
+                Optional<Throwable> checkedRun = F.checkedRun(() -> {
+                    event.accept(me());
+                });
+
+                pressed.set(false);
+                checkedRun.ifPresent(NestedException::nestedThrow);
+            }
+
         });
         return this.add(but);
+    }
+    
+    public <T> R withValidationMaker(Function<R, ZKValidation.ExternalValidation> fun) {
+        return addOnDisplayAndRunIfDone(() -> {
+            ZKValidation.ExternalValidation apply = fun.apply(me());
+            ZKValid zkValid = new ZKValid(apply);
+
+            addValidationPersist(zkValid);
+        });
+    }
+
+    public <T> R addRadioCombobox(RadioComboboxMapper<T> mapper) {
+
+        boolean updatesEmpty = mapper.getOnSelectionUpdate().isEmpty();
+        if (mapper.isRadio()) {
+
+            Radiogroup radio = mapper.generateRadio();
+            mapper.radio = radio;
+            if (!updatesEmpty) {
+                radio.addEventListener(Events.ON_SELECT, l -> {
+                    mapper.getOnSelectionUpdate().forEach(Runnable::run);
+                });
+            }
+        } else {
+            Combobox combo = mapper.generateCombobox();
+            if (!updatesEmpty) {
+                combo.addEventListener(Events.ON_SELECT, l -> {
+                    mapper.getOnSelectionUpdate().forEach(Runnable::run);
+                });
+            }
+
+        }
+
+        return mapper.isRadio() ? this.add(mapper.radio) : this.add(mapper.combo);
+
+    }
+
+    public <T> R addList(ListitemRenderer<T> renderer, Supplier<Collection<T>> supp) {
+        ListModelList<T> model = new ListModelList<>();
+
+        this.withUpdateRefresh(r -> {
+            model.clear();
+            model.addAll(supp.get());
+        });
+        return addListElems(renderer, model);
+    }
+
+    public <T, E> R addList(ListitemRenderer<E> renderer, Supplier<Collection<T>> collection, Function<? super T, E> mapper) {
+        return addList(renderer, () -> {
+            return collection.get().stream().map(mapper).collect(Collectors.toList());
+        });
+
+    }
+    
+    public R withStyle(int index, String style) {
+        return this.withNodeDecorator(index, c -> {
+            if (c instanceof HtmlBasedComponent) {
+                HtmlBasedComponent comp = F.cast(c);
+                comp.setStyle(style);
+            }
+        });
+    }
+
+    public R addListbox(Listbox listbox) {
+        withUpdateRender(r -> {
+            ListModel model = listbox.getModel();
+            if(model.getSize() == 0){
+                listbox.setVisible(false);
+            }else{
+                listbox.setVisible(true);
+            }
+            listbox.setModel(model);
+        });
+        return add(listbox);
+    }
+
+    public R addList(ListModel<String> list) {
+        Listbox listbox = new Listbox();
+        return addListbox(listbox);
+    }
+
+    public <T> R addListElems(ListitemRenderer<T> renderer, ListModel<T> list) {
+        Listbox listbox = new Listbox();
+        listbox.appendChild(new Listhead());
+        listbox.setItemRenderer(renderer);
+        return addListbox(listbox);
     }
 
 }
