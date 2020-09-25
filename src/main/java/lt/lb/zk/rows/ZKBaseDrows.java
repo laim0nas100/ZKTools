@@ -22,24 +22,4 @@ public abstract class ZKBaseDrows<R extends ZKBaseDrow, DR extends ZKBaseDrows<R
         this.grid = grid;
     }
 
-
-    @Override
-    public void renderEverything() {
-        doInOrderNested(r -> {
-            r.render();
-        });
-    }
-
-    @Override
-    public void renderAfterStructureChange() {
-        invalidateRows();
-        renderEverything();
-    }
-
-    @Override
-    public void renderAfterVisibilityChange() {
-        invalidateVisibility();
-        renderEverything();
-    }
-
 }
