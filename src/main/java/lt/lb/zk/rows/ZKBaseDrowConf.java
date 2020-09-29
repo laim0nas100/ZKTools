@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lt.lb.commons.F;
 import lt.lb.commons.Ins;
 import lt.lb.commons.SafeOpt;
@@ -31,10 +34,10 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     public String defaultGridValign = "middle";
 
     public ZKBaseDrowConf() {
-        withComponentDecorator(Textbox.class, c -> c.setHflex("1"));
-        withComponentDecorator(Button.class, c -> c.setMold("trendy"));
-        withComponentDecorator(Listbox.class, c -> {
-            withUpdateRefresh(r -> {
+        withComponentDecorator(Textbox.class, (r, c) -> c.setHflex("1"));
+        withComponentDecorator(Button.class, (r, c) -> c.setMold("trendy"));
+        withComponentDecorator(Listbox.class, (r, c) -> {
+            r.withUpdateRefresh(row -> {
                 ListModel model = c.getModel();
                 if (model != null && model.getSize() > 0) {
                     c.setVisible(true);
@@ -166,10 +169,13 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         super.configureUpdates(updates, object);
     }
 
-    public <N extends Component> void withComponentDecorator(Class<N> cls, Consumer<N> cons) {
+    public <N extends Component> void withComponentDecorator(Class<N> cls, BiConsumer<R, N> cons) {
         this.withUpdateDisplay(r -> {
             Ins.InsCl<N> of = Ins.of(cls);
-            r.getNodes().stream().filter(of::superClassOf).map(m -> (N) m).forEach(cons);
+            Stream<N> map = r.getNodes().stream().filter(of::superClassOf).map(m -> (N) m);
+            map.forEach(node -> {
+                cons.accept(r, node);
+            });
         });
     }
 

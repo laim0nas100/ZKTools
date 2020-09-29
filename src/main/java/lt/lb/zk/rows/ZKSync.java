@@ -254,10 +254,11 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
             return SafeOpt.of(box).map(m -> m.getSelectedItem()).map(m -> (T) m.getValue()).orElse(null);
         });
         sync.withDisplaySync(supl -> {
+            box.setModel(new ListModelList<>(options));
             box.setSelectedIndex(options.indexOf(supl));
         });
         box.setItemRenderer(renderer);
-        box.setModel(new ListModelList<>(options));
+
         box.addEventListener(Events.ON_CHANGE, ev -> {
             sync.syncManagedFromDisplay();
         });
