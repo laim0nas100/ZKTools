@@ -3,6 +3,8 @@ package lt.lb.zk.builder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lt.lb.commons.F;
+import lt.lb.commons.Ins;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.Props;
 
@@ -116,6 +118,87 @@ public class Prop<T> extends Props.PropGet<String> {
     public SafeOpt<List<String>> getSafeList() {
         return getSafe().map(m -> m.getList());
     }
+
+    public boolean getOrDefaultBool() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeBool().orElse((Boolean) def);
+    }
+    
+    public Integer getOrDefaultInt() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeInt().orElse((Integer) def);
+    }
+    
+    public Long getOrDefaultLong() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeLong().orElse((Long) def);
+    }
+    
+    public Float getOrDefaultFloat() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeFloat().orElse((Float) def);
+    }
+    
+    public Double getOrDefaultDouble() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeDouble().orElse((Double) def);
+    }
+    
+    public List<Integer> getOrDefaultIntList() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeIntList().orElse((List<Integer>) def);
+    }
+    
+    public List<Long> getOrDefaultLongList() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeLongList().orElse((List<Long>) def);
+    }
+    
+    public List<Float> getOrDefaultFloatList() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeFloatList().orElse((List<Float>) def);
+    }
+    
+    public List<Double> getOrDefaultDoubleList() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeDoubleList().orElse((List<Double>) def);
+    }
+    
+    public List<String> getOrDefaultList() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeList().orElse((List<String>) def);
+    }
+
 
     public Prop(String propKey) {
         this(propKey, true);

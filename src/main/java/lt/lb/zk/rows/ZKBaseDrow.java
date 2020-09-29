@@ -170,15 +170,6 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
     }
 
     public R addListbox(Listbox listbox) {
-        withUpdateRender(r -> {
-            ListModel model = listbox.getModel();
-            if(model.getSize() == 0){
-                listbox.setVisible(false);
-            }else{
-                listbox.setVisible(true);
-            }
-            listbox.setModel(model);
-        });
         return add(listbox);
     }
 

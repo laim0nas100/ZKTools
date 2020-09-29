@@ -17,6 +17,8 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Hlayout;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 
@@ -31,6 +33,17 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     public ZKBaseDrowConf() {
         withComponentDecorator(Textbox.class, c -> c.setHflex("1"));
         withComponentDecorator(Button.class, c -> c.setMold("trendy"));
+        withComponentDecorator(Listbox.class, c -> {
+            withUpdateRefresh(r -> {
+                ListModel model = c.getModel();
+                if (model != null && model.getSize() > 0) {
+                    c.setVisible(true);
+                } else {
+                    c.setVisible(false);
+                }
+                c.setModel(model);
+            });
+        });
     }
 
     @Override
