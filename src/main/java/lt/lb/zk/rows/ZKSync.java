@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
+import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.datasync.base.NodeSync;
 import lt.lb.commons.func.Converter;
@@ -255,12 +256,31 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         });
         sync.withDisplaySync(supl -> {
             box.setModel(new ListModelList<>(options));
-            box.setSelectedIndex(options.indexOf(supl));
+
         });
-        box.setItemRenderer(renderer);
+        box.setItemRenderer(new ComboitemRenderInfoRenderer<T>() {
+            @Override
+            public void render(ComboitemRenderInfo<T> info) throws Exception {
+
+                renderer.render(info);
+
+                if (info.index + 1 == options.size()) {
+                    int indexOf = options.indexOf(sync.getManaged());
+                    box.setSelectedIndex(indexOf);
+                }
+
+            }
+        });
 
         box.addEventListener(Events.ON_CHANGE, ev -> {
-            sync.syncManagedFromDisplay();
+
+            int index = box.getSelectedIndex();
+            if (index >= 0) {
+                sync.setManaged(options.get(index));
+            } else{
+                sync.setManaged(null);
+            }
+
         });
 
         return sync;
