@@ -30,22 +30,25 @@ import org.zkoss.zul.Textbox;
  * @author Laimonas-Beniusis-PC
  */
 public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>> extends BaseDrowSyncConf<R, ZKCell, Component, ZKLine<R, DR>, ZKUpdates, ZKBaseDrowConf<R, DR>> {
-
+    
     public String defaultGridValign = "middle";
-
+    
     public ZKBaseDrowConf() {
         withComponentDecorator(Textbox.class, (r, c) -> c.setHflex("1"));
         withComponentDecorator(Button.class, (r, c) -> c.setMold("trendy"));
-        withComponentDecorator(Listbox.class, (r,c)->c.setPageSize(20));
+        withComponentDecorator(Listbox.class, (r, c) -> {
+            c.setMold("paging");
+            c.setPageSize(20);
+        });
     }
-
+    
     @Override
     public Component getEnclosingNode(ZKBaseDrow drow) {
         Hlayout hlayout = new Hlayout();
         hlayout.setHflex("1");
         return hlayout;
     }
-
+    
     @Override
     public ZKCell createCell(List<Component> nodes, Component enclosingNode, R drow) {
         ZKCell cell = new ZKCell();
@@ -53,7 +56,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         cell.setEnclosed(F.cast(enclosingNode));
         return cell;
     }
-
+    
     @Override
     public void renderRow(R row) {
         ZKLine<R, DR> line = F.cast(row.getLine());
@@ -63,15 +66,15 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         line.setDerender(() -> {
             line.row.detach();
             line.row.getChildren().clear();
-
+            
             line.getCells().clear();
             line.getRenderedNodes().clear();
         });
-
+        
         if (!row.isRendable()) {
             return;
         }
-
+        
         Integer rowIndex = rows.getVisibleRowIndex(row.getKey());
         if (rowIndex == -1) {
             throw new IllegalArgumentException(row.getKey() + " was not in " + rows.getComposableKey());
@@ -85,31 +88,31 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
                 Component enclosed = zkCell.getEnclosed().get();
                 enclosed.getChildren().clear();
                 enclosed.getChildren().addAll(zkCell.getNodes());
-
+                
                 Cell cell = zkCell.getCell();
                 cell.getChildren().clear();
                 cell.setColspan(zkCell.getColSpan());
                 cell.setAlign(zkCell.getAllign());
                 cell.appendChild(enclosed);
                 cell.invalidate();
-
+                
                 line.getRenderedNodes().add(cell);
                 line.row.appendChild(cell);
-
+                
             } else {
-
+                
                 Cell cell = zkCell.getCell();
                 cell.getChildren().clear();
                 cell.getChildren().addAll(zkCell.getNodes());
                 cell.setColspan(zkCell.getColSpan());
                 cell.setAlign(zkCell.getAllign());
                 cell.invalidate();
-
+                
                 line.getRenderedNodes().add(cell);
                 line.row.appendChild(cell);
             }
         }
-
+        
         if (line.getRenderedNodes().size() == 1) {
             conditionalAlligment(line, 0, "center");
         } else if (line.getRenderedNodes().size() == 2) {
@@ -125,14 +128,14 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
                 } else {
                     conditionalAlligment(line, i, "center");
                 }
-
+                
             });
         }
-
+        
     }
-
+    
     protected void conditionalAlligment(ZKLine<R, DR> line, int index, String align) {
-
+        
         if (StringOp.isNotEmpty(line.getCells().get(index).getAllign())) { // something is defined, don't use default
             return;
         }
@@ -141,24 +144,24 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
                 .select(Cell.class)
                 .ifPresent(m -> m.setValign(defaultGridValign))
                 .ifPresent(m -> m.setAlign(align));
-
+        
     }
-
+    
     @Override
     public ZKUpdates createUpdates(String type, R object) {
         return new ZKUpdates(type);
     }
-
+    
     @Override
     public void doUpdates(ZKUpdates updates, R object) {
         updates.commit();
     }
-
+    
     @Override
     public void configureUpdates(Map<String, ZKUpdates> updates, R object) {
         super.configureUpdates(updates, object);
     }
-
+    
     public <N extends Component> void withComponentDecorator(Class<N> cls, BiConsumer<R, N> cons) {
         this.withUpdateDisplay(r -> {
             Ins.InsCl<N> of = Ins.of(cls);
@@ -168,7 +171,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
             });
         });
     }
-
+    
     @Override
     public <M> Valid<M> createValidation(R row, ZKCell cell, Component node, Predicate<M> isValid, Function<? super M, String> error) {
         Objects.requireNonNull(node);
@@ -177,16 +180,16 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         valid.isValid = isValid;
         return valid;
     }
-
+    
     @Override
     public <M> Valid<M> createValidation(R row, Predicate<M> isValid, Function<? super M, String> error) {
         ZKLine<R, DR> line = F.cast(row.getLine());
         return createValidation(row, null, line.row, isValid, error);
     }
-
+    
     @Override
     public ZKBaseDrowConf<R, DR> me() {
         return this;
     }
-
+    
 }
