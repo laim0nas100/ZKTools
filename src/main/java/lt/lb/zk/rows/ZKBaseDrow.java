@@ -175,6 +175,7 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
 
     public R addList(ListModel<String> list) {
         Listbox listbox = new Listbox();
+        listbox.setModel(list);
         return addListbox(listbox);
     }
 
@@ -182,6 +183,7 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
         Listbox listbox = new Listbox();
         listbox.appendChild(new Listhead());
         listbox.setItemRenderer(renderer);
+        listbox.setModel(list);
         return addListbox(listbox);
     }
 

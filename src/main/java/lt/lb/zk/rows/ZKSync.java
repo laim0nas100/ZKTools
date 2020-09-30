@@ -201,7 +201,13 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
             HashSet<T> set = Sets.newHashSet(val);
             return box.getItems().stream().filter(f -> set.contains((T) f.getValue())).collect(Collectors.toSet());
         });
-        box.setItemRenderer(renderer);
+        box.setItemRenderer(new ListitemRenderInfoRenderer<T>(){
+            @Override
+            public void render(ListitemRenderInfo<T> info) throws Exception {
+                box.setVisible(true);
+                renderer.render(info);
+            }
+        });
         box.addEventListener(Events.ON_CHANGE, ev -> {
             sync.syncManagedFromDisplay();
         });
@@ -228,7 +234,13 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         sync.withDisplaySet(val -> {
             return new ListModelList<>(val);
         });
-        box.setItemRenderer(renderer);
+        box.setItemRenderer(new ListitemRenderInfoRenderer<T>(){
+            @Override
+            public void render(ListitemRenderInfo<T> info) throws Exception {
+                box.setVisible(true);
+                renderer.render(info);
+            }
+        });
         box.addEventListener(Events.ON_CHANGE, ev -> {
             sync.syncManagedFromDisplay();
         });

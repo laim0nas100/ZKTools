@@ -36,17 +36,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     public ZKBaseDrowConf() {
         withComponentDecorator(Textbox.class, (r, c) -> c.setHflex("1"));
         withComponentDecorator(Button.class, (r, c) -> c.setMold("trendy"));
-        withComponentDecorator(Listbox.class, (r, c) -> {
-            r.withUpdateRefresh(row -> {
-                ListModel model = c.getModel();
-                if (model != null && model.getSize() > 0) {
-                    c.setVisible(true);
-                } else {
-                    c.setVisible(false);
-                }
-                c.setModel(model);
-            });
-        });
+        withComponentDecorator(Listbox.class, (r,c)->c.setPageSize(20));
     }
 
     @Override
