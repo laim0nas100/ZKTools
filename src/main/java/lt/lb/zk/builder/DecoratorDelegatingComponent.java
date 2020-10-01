@@ -18,7 +18,7 @@ public abstract class DecoratorDelegatingComponent extends HtmlMacroComponent {
     private String type;
 
     protected abstract ComponentBuilder getBuilder(String type);
-    
+
     @Override
     public void afterCompose() {
         super.afterCompose();
@@ -28,7 +28,7 @@ public abstract class DecoratorDelegatingComponent extends HtmlMacroComponent {
             throw new IllegalArgumentException("Failed to get decorator of type: " + type);
         }
 
-        CTX ctx = builder.getContext();
+        CTX ctx = builder.getNewContext();
         final Props props = ctx.getData();
         for (Prop prop : ctx.getProperties()) {
             String k = prop.propKey;
@@ -43,7 +43,13 @@ public abstract class DecoratorDelegatingComponent extends HtmlMacroComponent {
             }
 
         }
-        builder.build(root);
+
+        try {
+
+            builder.build(root, ctx);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public String getType() {
