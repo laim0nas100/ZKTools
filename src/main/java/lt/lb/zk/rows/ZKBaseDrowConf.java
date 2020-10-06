@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lt.lb.commons.F;
 import lt.lb.commons.Ins;
@@ -17,13 +15,9 @@ import lt.lb.commons.datasync.Valid;
 import lt.lb.commons.parsing.StringOp;
 import lt.lb.commons.rows.base.BaseDrowSyncConf;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Hlayout;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Rows;
-import org.zkoss.zul.Textbox;
 
 /**
  *
@@ -34,12 +28,6 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     public String defaultGridValign = "middle";
     
     public ZKBaseDrowConf() {
-        withComponentDecorator(Textbox.class, (r, c) -> c.setHflex("1"));
-        withComponentDecorator(Button.class, (r, c) -> c.setMold("trendy"));
-        withComponentDecorator(Listbox.class, (r, c) -> {
-            c.setMold("paging");
-            c.setPageSize(20);
-        });
     }
     
     @Override
