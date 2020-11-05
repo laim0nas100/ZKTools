@@ -16,7 +16,7 @@ import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.datasync.base.NodeSync;
-import lt.lb.commons.func.Converter;
+import lt.lb.commons.func.BiConverter;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
@@ -53,7 +53,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         return new ZKValid<>(this.nodes);
     }
 
-    public static <T> ZKSync<T, String, Textbox> ofTextboxFormatted(ValueProxy<T> persistProxy, Textbox tb, T def, Converter<SafeOpt<T>, String> conv) {
+    public static <T> ZKSync<T, String, Textbox> ofTextboxFormatted(ValueProxy<T> persistProxy, Textbox tb, T def, BiConverter<SafeOpt<T>, String> conv) {
 
         ZKSync<T, String, Textbox> sync = new ZKSync<>(tb);
         sync.withIdentityPersist();
@@ -68,7 +68,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         return sync;
     }
 
-    public static <V, M, C extends InputElement> ZKSync<V, M, C> ofInputElement(ValueProxy<V> persistProxy, C tb, Converter<V, M> conv) {
+    public static <V, M, C extends InputElement> ZKSync<V, M, C> ofInputElement(ValueProxy<V> persistProxy, C tb, BiConverter<V, M> conv) {
         ZKSync<V, M, C> sync = new ZKSync<>(tb);
 
         sync.withIdentityPersist();
@@ -84,7 +84,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
     }
 
     public static <V, C extends InputElement> ZKSync<V, V, C> ofInputElement(ValueProxy<V> persistProxy, C tb) {
-        return ofInputElement(persistProxy, tb, Converter.identity());
+        return ofInputElement(persistProxy, tb, BiConverter.identity());
     }
 
     public static ZKSync<String, String, Textbox> ofTextbox(ValueProxy<String> persistProxy, Textbox tb) {
