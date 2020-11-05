@@ -51,8 +51,6 @@ public abstract class DefaultZKDrowsBuilder<R extends ZKBaseDrow<R, RR>, RR exte
         rows.grid.setParent(root);
         constructLogic(root, rows, context);
         rows.syncManagedFromPersist();
-        rows.update();
-        rows.renderEverything();
         rows.syncDisplay();
 
         return rows;

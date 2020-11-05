@@ -33,6 +33,7 @@ import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Longbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.impl.InputElement;
+import lt.lb.commons.func.BiConverter;
 
 /**
  *
@@ -237,7 +238,6 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         box.setItemRenderer(new ListitemRenderInfoRenderer<T>(){
             @Override
             public void render(ListitemRenderInfo<T> info) throws Exception {
-                box.setVisible(true);
                 renderer.render(info);
             }
         });

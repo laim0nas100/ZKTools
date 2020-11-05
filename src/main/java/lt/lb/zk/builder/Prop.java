@@ -3,8 +3,6 @@ package lt.lb.zk.builder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lt.lb.commons.F;
-import lt.lb.commons.Ins;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.values.Props;
 
@@ -33,6 +31,14 @@ public class Prop<T> extends Props.PropGet<String> {
 
     public SafeOpt<Prop<T>> getSafe() {
         return SafeOpt.of(this);
+    }
+
+    public String getString() {
+        return get(props);
+    }
+
+    public SafeOpt<String> getSafeString() {
+        return getSafe().map(m -> m.getString());
     }
 
     public boolean getBool() {
@@ -118,6 +124,14 @@ public class Prop<T> extends Props.PropGet<String> {
     public SafeOpt<List<String>> getSafeList() {
         return getSafe().map(m -> m.getList());
     }
+    
+    public String getOrDefaultString() {
+        T def = this.defaultVal;
+        if (def == null) {
+            throw new IllegalArgumentException("No default value for " + this.propKey);
+        }
+        return this.getSafeString().orElse((String) def);
+    }
 
     public boolean getOrDefaultBool() {
         T def = this.defaultVal;
@@ -126,7 +140,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeBool().orElse((Boolean) def);
     }
-    
+
     public Integer getOrDefaultInt() {
         T def = this.defaultVal;
         if (def == null) {
@@ -134,7 +148,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeInt().orElse((Integer) def);
     }
-    
+
     public Long getOrDefaultLong() {
         T def = this.defaultVal;
         if (def == null) {
@@ -142,7 +156,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeLong().orElse((Long) def);
     }
-    
+
     public Float getOrDefaultFloat() {
         T def = this.defaultVal;
         if (def == null) {
@@ -150,7 +164,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeFloat().orElse((Float) def);
     }
-    
+
     public Double getOrDefaultDouble() {
         T def = this.defaultVal;
         if (def == null) {
@@ -158,7 +172,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeDouble().orElse((Double) def);
     }
-    
+
     public List<Integer> getOrDefaultIntList() {
         T def = this.defaultVal;
         if (def == null) {
@@ -166,7 +180,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeIntList().orElse((List<Integer>) def);
     }
-    
+
     public List<Long> getOrDefaultLongList() {
         T def = this.defaultVal;
         if (def == null) {
@@ -174,7 +188,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeLongList().orElse((List<Long>) def);
     }
-    
+
     public List<Float> getOrDefaultFloatList() {
         T def = this.defaultVal;
         if (def == null) {
@@ -182,7 +196,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeFloatList().orElse((List<Float>) def);
     }
-    
+
     public List<Double> getOrDefaultDoubleList() {
         T def = this.defaultVal;
         if (def == null) {
@@ -190,7 +204,7 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeDoubleList().orElse((List<Double>) def);
     }
-    
+
     public List<String> getOrDefaultList() {
         T def = this.defaultVal;
         if (def == null) {
@@ -198,7 +212,6 @@ public class Prop<T> extends Props.PropGet<String> {
         }
         return this.getSafeList().orElse((List<String>) def);
     }
-
 
     public Prop(String propKey) {
         this(propKey, true);
