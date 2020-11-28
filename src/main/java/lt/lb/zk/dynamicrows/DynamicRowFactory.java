@@ -7,6 +7,7 @@ import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
 import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuples;
+import lt.lb.commons.iteration.For;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Cell;
@@ -55,7 +56,7 @@ public interface DynamicRowFactory {
                     cells.get(0).setAlign("left");
                     cells.get(1).setAlign("right");
                 } else if (cells.size() > 2) {
-                    F.iterate(cells, (i, c) -> {
+                    For.elements().iterate(cells, (i, c) -> {
                         if (i == 0) {
                             c.setAlign("left");
                         } else if (i == cells.size() - 1) {

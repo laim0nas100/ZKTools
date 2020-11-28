@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import lt.lb.commons.F;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.containers.caching.LazyDependantValue;
 import lt.lb.commons.containers.caching.LazyValue;
@@ -21,6 +20,7 @@ import lt.lb.commons.containers.values.BooleanValue;
 import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.func.unchecked.UnsafeSupplier;
+import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
 import lt.lb.commons.iteration.TreeVisitor;
 import lt.lb.commons.iteration.Visitor;
@@ -461,10 +461,10 @@ public class ZKValidation {
                 map.computeIfAbsent(c, k -> new ArrayList<>(1)).add(v);
             }
         }
-        F.find(map, (comp, validationList) -> {
+        For.entries().find(map, (comp, validationList) -> {
             //find first invalid validation
-            Optional<String> finalVal = F.find(validationList, (i, validation) -> !validation.isValid())
-                    .map(m -> m.g2.message.get());
+            Optional<String> finalVal = For.elements().find(validationList, (i, validation) -> !validation.isValid())
+                    .map(m -> m.val.message.get());
             if (finalVal.isPresent()) { // invalid
                 _wrongValue(comp, finalVal.get());
                 valid.setFalse();

@@ -15,10 +15,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lt.lb.commons.F;
-import lt.lb.commons.Log;
 import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.caching.LazyDependantValue;
-import lt.lb.commons.misc.ExtComparator;
+import lt.lb.commons.iteration.For;
+import lt.lb.commons.misc.compare.ExtComparator;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Grid;
@@ -62,12 +62,12 @@ public class DynamicRows {
 
         Map<Integer, List> composed = new HashMap<>();
 
-        F.iterate(this.composable, (key, rows) -> {
+        For.entries().iterate(this.composable, (key, rows) -> {
             int index = Math.max(rowKeyOrder.get().getOrDefault(key, 0), 0);
             composed.computeIfAbsent(index, i -> new LinkedList<>()).add(rows);
         });
 
-        F.iterate(m, (key, row) -> {
+        For.elements().iterate(m, (key, row) -> {
             composed.computeIfAbsent(key, i -> new LinkedList<>()).add(row);
         });
 
@@ -305,11 +305,10 @@ public class DynamicRows {
                 .filter(r -> r.isVisible())
                 .collect(Collectors.toList());
         if (rows.isEmpty()) {
-            Log.print("Rows are empty");
             return;
         }
 
-//        F.iterate(rows, (i, r) -> {
+//        For.elements().iterate(rows, (i, r) -> {
 //            Log.print(r.getKey(),
 //                    "Visible:", r.getVisibleIndices(),
 //                    "Colspan Prefered:", r.getPreferedColSpan(),
@@ -324,10 +323,9 @@ public class DynamicRows {
 
         List<DynamicRow> rowsToChange = rows.stream().filter(r -> r.needUpdate(maxColSpan)).collect(Collectors.toList());
         if (rowsToChange.isEmpty()) {
-            Log.print("Rows to change are empty");
             return;
         }
-        F.iterate(rowsToChange, (rowIndex, r) -> {
+        For.elements().iterate(rowsToChange, (rowIndex, r) -> {
             List<Cell> visibleCells = r.getCells().stream().filter(c -> c.isVisible()).collect(Collectors.toList());
             if (visibleCells.isEmpty()) {
                 return;
@@ -336,7 +334,7 @@ public class DynamicRows {
             double preferedTotal = preferedColSpan.stream().mapToDouble(m -> m.doubleValue()).sum();
 
             Integer[] colApply = new Integer[preferedColSpan.size()];
-            F.iterate(preferedColSpan, (i, pref) -> {
+            For.elements().iterate(preferedColSpan, (i, pref) -> {
                 double rat = pref / preferedTotal;
                 colApply[i] = (int) Math.floor(rat * maxColSpan);
             });
@@ -356,7 +354,6 @@ public class DynamicRows {
                 }
             }
             List<Integer> oldColSpan = visibleCells.stream().map(m -> m.getColspan()).collect(Collectors.toList());
-            Log.print("Change collspan of", r.getKey(), r.getVisibleIndices(), oldColSpan, Arrays.asList(colApply));
 
             for (int i = 0; i < colApply.length; i++) {
                 visibleCells.get(i).setColspan(colApply[i]);

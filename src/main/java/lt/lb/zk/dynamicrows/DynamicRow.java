@@ -24,13 +24,13 @@ import java.util.stream.Stream;
 import lt.lb.commons.containers.values.BindingValue;
 import lt.lb.commons.F;
 import lt.lb.commons.Java;
-import lt.lb.commons.Log;
 import lt.lb.commons.misc.ReflectionUtils;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.containers.tuples.Tuples;
 import lt.lb.commons.containers.values.ValueProxy;
+import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
-import lt.lb.commons.misc.ExtComparator;
+import lt.lb.commons.misc.compare.ExtComparator;
 import lt.lb.commons.misc.NestedException;
 import lt.lb.zk.ZKComponents;
 import lt.lb.zk.ZKValidation;
@@ -161,7 +161,7 @@ public class DynamicRow {
         double preferedTotal = preferedColSpan.stream().mapToDouble(m -> m.doubleValue()).sum();
 
         Integer[] colApply = new Integer[preferedColSpan.size()];
-        F.iterate(preferedColSpan, (i, pref) -> {
+        For.elements().iterate(preferedColSpan, (i, pref) -> {
             double rat = pref / preferedTotal;
             colApply[i] = (int) Math.floor(rat * maxColSpan);
         });
@@ -216,7 +216,7 @@ public class DynamicRow {
                 doRun(DecorType.UPDATE, () -> action.accept(this));
             });
         });
-        F.iterate(dec, (i, t) -> {
+        For.elements().iterate(dec, (i, t) -> {
             this.decorators.put(t.g1, t.g2);
         });
         this.rowMaker = rowMaker;
@@ -225,7 +225,7 @@ public class DynamicRow {
             this.rowMaker.accept(this, cells);
         });
         onDisplay.add(() -> {
-            F.iterate(mainIterator(), (i, tup) -> {
+            For.elements().iterate(mainIterator(), (i, tup) -> {
                 Component comp = tup.getG2();
                 BiConsumer<DynamicRow, Component> get = decorators.get(comp.getClass());
                 if (get != null) {
@@ -319,7 +319,7 @@ public class DynamicRow {
         int beforeIndex = comps[0];
         int afterIndex = comps[comps.length - 1];
 
-        F.iterate(mainIterator(), (i, tup) -> {
+        For.elements().iterate(mainIterator(), (i, tup) -> {
             Cell cell = tup.g1;
             int cellIndex = cells.indexOf(cell);
             Integer colSpan = cellColSpan.get(cellIndex);
@@ -343,7 +343,7 @@ public class DynamicRow {
         });
         //insert before merged
 
-        F.iterate(before, (i, tup) -> {
+        For.elements().iterate(before, (i, tup) -> {
             newCells.add(tup.getG2());
             newColSpans.add(tup.g1);
         });
@@ -355,7 +355,7 @@ public class DynamicRow {
         this.finalAdd(mergedComp, enclosing, newCells, mergedColspan, newColSpans);
 
         //insert after merged
-        F.iterate(after, (i, tup) -> {
+        For.elements().iterate(after, (i, tup) -> {
             newCells.add(tup.getG2());
             newColSpans.add(tup.g1);
         });
@@ -517,13 +517,10 @@ public class DynamicRow {
     public DynamicRow addBoundTextbox(Textbox box, ValueProxy<String> data) {
         BiConsumer<Component, Consumer> formUpdate = (comp, cons) -> {
             Textbox tb = F.cast(comp);
-            Log.print("Update form", tb, tb.getText());
-
             cons.accept(tb.getText());
         };
         BiConsumer<Supplier, Component> uiUpdate = (supp, comp) -> {
             Textbox tb = F.cast(comp);
-            Log.print("Update view", tb, tb.getText(), supp.get());
             tb.setText(F.cast(supp.get()));
         };
         return this.addBoundElement(() -> box, data, formUpdate, uiUpdate);
@@ -762,7 +759,7 @@ public class DynamicRow {
             }
 
             @Override
-            public Integer getCurrentIndex() {
+            public int getCurrentIndex() {
                 return totalIndex;
             }
 
@@ -812,23 +809,23 @@ public class DynamicRow {
 
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
         return () -> {
-            return F.find(mainIterator(), (i, tuple) -> pred.test(Tuples.create(i, tuple.g2)))
-                    .map(m -> m.g2.g1).orElse(null);
+            return For.elements().find(mainIterator(), (i, tuple) -> pred.test(Tuples.create(i, tuple.g2)))
+                    .map(m -> m.val.g1).orElse(null);
         };
     }
 
     public Supplier<Component> getComponentSupplier(Integer i) {
         return () -> {
-            return F.find(mainIterator(), (j, tuple) -> Objects.equals(i, j))
-                    .map(m -> m.g2.g2).orElse(null);
+            return For.elements().find(mainIterator(), (j, tuple) -> Objects.equals(i, j))
+                    .map(m -> m.val.g2).orElse(null);
         };
     }
 
     public Supplier<Component> getComponentSupplier(Predicate<Component> pred) {
 
         return () -> {
-            return F.find(mainIterator(), (j, tuple) -> pred.test(tuple.g2))
-                    .map(m -> m.g2.g2).orElse(null);
+            return For.elements().find(mainIterator(), (j, tuple) -> pred.test(tuple.g2))
+                    .map(m -> m.val.g2).orElse(null);
         };
     }
 
@@ -969,7 +966,7 @@ public class DynamicRow {
     }
 
     public DynamicRow withPreferedColspan(Integer... spans) {
-        F.iterate(spans, (i, spa) -> {
+        For.elements().iterate(spans, (i, spa) -> {
             this.cellColSpan.set(i, spa);
             this.getCell(i).setColspan(spa);
         });
@@ -1080,7 +1077,7 @@ public class DynamicRow {
 
     public ArrayList<Integer> getVisibleIndices() {
         ArrayList<Integer> list = new ArrayList<>();
-        F.iterate(cells, (i, cell) -> {
+        For.elements().iterate(cells, (i, cell) -> {
             if (cell.isVisible()) {
                 list.add(i);
             }
@@ -1099,7 +1096,7 @@ public class DynamicRow {
 
     public ArrayList<Integer> getPreferedColSpanOfVisible() {
         ArrayList<Integer> prefVis = new ArrayList<>();
-        F.iterate(cells, (i, c) -> {
+        For.elements().iterate(cells, (i, c) -> {
             if (c.isVisible()) {
                 prefVis.add(getPreferedColSpan().get(i));
             }
@@ -1109,7 +1106,7 @@ public class DynamicRow {
 
     public ArrayList<Integer> getColSpanOfVisible() {
         ArrayList<Integer> prefVis = new ArrayList<>();
-        F.iterate(cells, (i, c) -> {
+        For.elements().iterate(cells, (i, c) -> {
             if (c.isVisible()) {
                 prefVis.add(c.getColspan());
             }
@@ -1142,7 +1139,6 @@ public class DynamicRow {
             });
             rowww.append(sb).append(" ");
         }
-        Log.print(rowww);
     }
 
 }

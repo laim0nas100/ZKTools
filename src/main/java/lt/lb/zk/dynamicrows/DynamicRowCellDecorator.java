@@ -2,7 +2,7 @@ package lt.lb.zk.dynamicrows;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import lt.lb.commons.F;
+import lt.lb.commons.iteration.For;
 import org.zkoss.zul.Cell;
 
 /**
@@ -61,7 +61,7 @@ public interface DynamicRowCellDecorator {
 
     public static DynamicRowCellDecorator cellRowSpan(Integer... rowspans) {
         return (cells) -> {
-            F.iterate(rowspans, (i, option) -> {
+            For.elements().iterate(rowspans, (i, option) -> {
                 cells.get(i).setRowspan(option);
             });
         };
@@ -75,7 +75,7 @@ public interface DynamicRowCellDecorator {
 
     public static <T> DynamicRowCellDecorator cellArray(BiConsumer<T, Cell> consumer, T... options) {
         return (cells) -> {
-            F.iterate(options, (i, option) -> {
+            For.elements().iterate(options, (i, option) -> {
                 consumer.accept(option, cells.get(i));
             });
         };
@@ -83,7 +83,7 @@ public interface DynamicRowCellDecorator {
 
     public static <T> DynamicRowCellDecorator cellAll(BiConsumer<T, Cell> consumer, T option) {
         return (cells) -> {
-            F.iterate(cells, (i, c) -> consumer.accept(option, c));
+            For.elements().iterate(cells, (i, c) -> consumer.accept(option, c));
         };
     }
 }

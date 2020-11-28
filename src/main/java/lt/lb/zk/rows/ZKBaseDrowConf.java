@@ -12,6 +12,7 @@ import lt.lb.commons.F;
 import lt.lb.commons.Ins;
 import lt.lb.commons.SafeOpt;
 import lt.lb.commons.datasync.Valid;
+import lt.lb.commons.iteration.For;
 import lt.lb.commons.parsing.StringOp;
 import lt.lb.commons.rows.base.BaseDrowSyncConf;
 import org.zkoss.zk.ui.Component;
@@ -108,7 +109,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
             conditionalAlligment(line, 1, "right");
         } else if (line.getRenderedNodes().size() > 2) {
             final int last = line.getCells().size() - 1;
-            F.iterate(line.getRenderedNodes(), (i, n) -> {
+            For.elements().iterate(line.getRenderedNodes(), (i, n) -> {
                 if (i == 0) {
                     conditionalAlligment(line, i, "left");
                 } else if (i == last) {

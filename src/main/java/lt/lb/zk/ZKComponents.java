@@ -8,6 +8,8 @@ import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
 import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.tuples.Tuple;
+import lt.lb.commons.iteration.For;
+import lt.lb.commons.iteration.Iter;
 import lt.lb.commons.misc.Range;
 import lt.lb.zk.Builder.EagerBuilder;
 import org.zkoss.zk.ui.Component;
@@ -115,7 +117,7 @@ public class ZKComponents {
     public static <T extends Component> T createZulComponent(String compName, Map<?, ?> args, Component parent, Tuple<String, Object>... params) {
         LineStringBuilder zk = new LineStringBuilder();
         zk.append("<").append(compName);
-        F.iterate(params, (i, t) -> {
+        For.elements().iterate(params, (i, t) -> {
             zk.append(" ").append(t.g1).append("=\"").append(t.g2).append("\" ");
         });
         zk.append("></").append(compName).append(">");

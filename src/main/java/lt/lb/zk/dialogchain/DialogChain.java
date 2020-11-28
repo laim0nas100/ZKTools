@@ -4,9 +4,9 @@ import lt.lb.zk.DialogDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import lt.lb.commons.F;
 import lt.lb.commons.func.unchecked.UnsafeConsumer;
 import lt.lb.commons.func.unchecked.UnsafeRunnable;
+import lt.lb.commons.iteration.For;
 import lt.lb.zk.DWindow;
 import org.zkoss.zk.ui.Component;
 
@@ -38,7 +38,7 @@ public class DialogChain {
     }
 
     public void detachAll() {
-        F.iterateBackwards(windows, (i, d) -> {
+        For.elements().iterateBackwards(windows, (i, d) -> {
             d.detach();
         });
         windows.clear();

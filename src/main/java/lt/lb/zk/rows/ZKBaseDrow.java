@@ -3,12 +3,12 @@ package lt.lb.zk.rows;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import lt.lb.zk.rows.ZKSync;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lt.lb.commons.F;
+import lt.lb.commons.iteration.For;
 import lt.lb.commons.misc.NestedException;
 import lt.lb.commons.rows.SyncDrow;
 import lt.lb.zk.ZKValidation;
@@ -64,7 +64,7 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
     
     public R withPreferedAllign(String... aligns) {
         return addOnDisplayAndRunIfDone(() -> {
-            F.iterate(aligns, (i, align) -> {
+            For.elements().iterate(aligns, (i, align) -> {
                 getCell(i).setAllign(align);
             });
         });
