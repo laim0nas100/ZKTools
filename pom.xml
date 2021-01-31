@@ -13,7 +13,7 @@
     </repositories>
     <properties>
         
-        <commonslb.commit>3e61427ebe40ea9da068ec1dfb8a8c2d7f37d17e</commonslb.commit>
+        <commonslb.commit>efa6cf056f92e6cbd6e556858db3c63ab67ce9d7</commonslb.commit>
         <commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>
         <!--<commonslb.commit>local-jar</commonslb.commit>-->
         <!--<commonslb.dir>lt.lb.commons</commonslb.dir>-->

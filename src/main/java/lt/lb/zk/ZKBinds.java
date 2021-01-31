@@ -105,7 +105,7 @@ public class ZKBinds {
                 callback.call(cast, field, object);
             });
             if (init) {
-                F.unsafeRun(() -> {
+                F.uncheckedRun(() -> {
                     callback.updateUI(cast, field, object);
                 });
             }

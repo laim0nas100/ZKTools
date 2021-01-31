@@ -648,14 +648,14 @@ public class DynamicRow {
     public DynamicRow addButton(String title, EventListener event) {
         Button but = new Button(title);
         but.addEventListener(Events.ON_CLICK, e -> {
-            doRun(DecorType.UI, () -> F.unsafeRun(() -> event.onEvent(e)));
+            doRun(DecorType.UI, () -> F.uncheckedRun(() -> event.onEvent(e)));
         });
         return this.add(but);
     }
 
     public DynamicRow addButton(Button but, EventListener event) {
         but.addEventListener(Events.ON_CLICK, e -> {
-            doRun(DecorType.UI, () -> F.unsafeRun(() -> event.onEvent(e)));
+            doRun(DecorType.UI, () -> F.uncheckedRun(() -> event.onEvent(e)));
         });
         return this.add(but);
     }
@@ -1124,7 +1124,7 @@ public class DynamicRow {
             StringBuilder sb = new StringBuilder();
             sb.append("cell=").append(c).append(" with =");
             sb.append(c.getChildren().get(0));
-            F.unsafeRun(() -> {
+            F.uncheckedRun(() -> {
                 Class cl = c.getClass();
                 while (!Object.class.equals(cl)) {
                     Field field = cl.getDeclaredField("_auxinf");

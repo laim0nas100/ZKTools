@@ -1,13 +1,13 @@
 package lt.lb.zk.dialogchain;
 
-import lt.lb.zk.DialogDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import lt.lb.commons.func.unchecked.UnsafeConsumer;
-import lt.lb.commons.func.unchecked.UnsafeRunnable;
+import lt.lb.commons.func.unchecked.UncheckedConsumer;
+import lt.lb.commons.func.unchecked.UncheckedRunnable;
 import lt.lb.commons.iteration.For;
 import lt.lb.zk.DWindow;
+import lt.lb.zk.DialogDTO;
 import org.zkoss.zk.ui.Component;
 
 /**
@@ -46,7 +46,7 @@ public class DialogChain {
 
     public <OPT, INFO> ChainDialogPattern<OPT, INFO> then(
             Consumer<ChainDialogPattern<OPT, INFO>> decor,
-            UnsafeConsumer<DialogResult<INFO>> consumer) throws Exception {
+            UncheckedConsumer<DialogResult<INFO>> consumer) throws Exception {
 
         ChainDialogPattern<OPT, INFO> pattern = new ChainDialogPattern<>(parentComponent);
         pattern.future = DialogDTO.ofFutureResult();
@@ -63,9 +63,9 @@ public class DialogChain {
 
     }
 
-    public <OPT, INFO> UnsafeRunnable thenRunnable(
+    public <OPT, INFO> UncheckedRunnable thenRunnable(
             Consumer<ChainDialogPattern<OPT, INFO>> decor,
-            UnsafeConsumer<DialogResult<INFO>> consumer) throws Exception {
+            UncheckedConsumer<DialogResult<INFO>> consumer) throws Exception {
 
         return () -> {
             then(decor, consumer);
@@ -73,11 +73,11 @@ public class DialogChain {
 
     }
 
-    public void thenDelegated(UnsafeConsumer<UnsafeRunnable> construction, UnsafeRunnable continuation) throws Exception {
+    public void thenDelegated(UncheckedConsumer<UncheckedRunnable> construction, UncheckedRunnable continuation) throws Exception {
         construction.accept(continuation);
     }
     
-    public void thenDelegated(UnsafeRunnable construction) throws Exception {
+    public void thenDelegated(UncheckedRunnable construction) throws Exception {
         construction.run();
     }
 

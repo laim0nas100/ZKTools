@@ -19,7 +19,7 @@ import lt.lb.commons.containers.caching.LazyValue;
 import lt.lb.commons.containers.values.BooleanValue;
 import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
-import lt.lb.commons.func.unchecked.UnsafeSupplier;
+import lt.lb.commons.func.unchecked.UncheckedSupplier;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
 import lt.lb.commons.iteration.TreeVisitor;
@@ -148,7 +148,7 @@ public class ZKValidation {
          * @param supp
          * @return
          */
-        public ExternalValidation withSafeValidation(UnsafeSupplier<Boolean> supp) {
+        public ExternalValidation withSafeValidation(UncheckedSupplier<Boolean> supp) {
             return withValidation(() -> {
                 try {
                     return supp.get();

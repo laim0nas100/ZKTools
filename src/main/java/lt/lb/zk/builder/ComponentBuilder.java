@@ -12,7 +12,7 @@ public interface ComponentBuilder<C extends CTX, R> {
     public R build(Component root, C context) throws Exception;
 
     public default R buildSafe(Component root, C context) {
-        return F.unsafeCall(() -> build(root, context));
+        return F.uncheckedCall(() -> build(root, context));
     }
 
     public C getNewContext();
