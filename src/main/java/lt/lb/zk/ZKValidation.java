@@ -463,9 +463,9 @@ public class ZKValidation {
         }
         For.entries().find(map, (comp, validationList) -> {
             //find first invalid validation
-            Optional<String> finalVal = For.elements().find(validationList, (i, validation) -> !validation.isValid())
+            SafeOpt<String> finalVal = For.elements().find(validationList, (i, validation) -> !validation.isValid())
                     .map(m -> m.val.message.get());
-            if (finalVal.isPresent()) { // invalid
+            if (finalVal.hasValueOrError()) { // invalid
                 _wrongValue(comp, finalVal.get());
                 valid.setFalse();
             } else {
@@ -474,7 +474,7 @@ public class ZKValidation {
             _markValidation(comp);
             return !full && valid.not(); // early return
 
-        });
+        }).getError().throwIfErrorNested();
         return valid.get();
     }
 

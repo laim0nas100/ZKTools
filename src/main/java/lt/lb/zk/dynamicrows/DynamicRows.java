@@ -3,6 +3,7 @@ package lt.lb.zk.dynamicrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +19,6 @@ import lt.lb.commons.F;
 import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.commons.containers.caching.LazyDependantValue;
 import lt.lb.commons.iteration.For;
-import lt.lb.commons.misc.compare.ExtComparator;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Grid;
@@ -53,7 +53,7 @@ public class DynamicRows {
     });
     private LazyDependantValue<List<DynamicRow>> rowsInOrder = rowKeyOrder.map(m -> {
         List<DynamicRow> collect = rowMap.values().stream().collect(Collectors.toList());
-        ExtComparator<DynamicRow> ofValue = ExtComparator.ofValue(r -> m.getOrDefault(r.getKey(), -1));
+        Comparator<DynamicRow> ofValue = Comparator.comparing(r -> m.getOrDefault(r.getKey(), -1));
         Collections.sort(collect, ofValue);
         return collect;
     });
@@ -71,7 +71,7 @@ public class DynamicRows {
             composed.computeIfAbsent(key, i -> new LinkedList<>()).add(row);
         });
 
-        Stream<Object> flatMap = composed.entrySet().stream().sorted(ExtComparator.ofValue(v -> v.getKey()))
+        Stream<Object> flatMap = composed.entrySet().stream().sorted(Comparator.comparing(v -> v.getKey()))
                 .map(entry -> entry.getValue())
                 .flatMap(list -> list.stream());
 

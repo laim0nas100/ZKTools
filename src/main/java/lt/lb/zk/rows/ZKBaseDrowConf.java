@@ -60,7 +60,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
             line.getRenderedNodes().clear();
         });
         
-        if (!row.isRendable()) {
+        if (!row.isActive()) {
             return;
         }
         

@@ -1,12 +1,12 @@
 package lt.lb.zk;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lt.lb.commons.SafeOpt;
-import lt.lb.commons.iteration.ReadOnlyIterator;
 import lt.lb.commons.iteration.TreeVisitor;
 import org.zkoss.zk.ui.Component;
 
@@ -27,8 +27,8 @@ public class ZKSelect {
             }
 
             @Override
-            public ReadOnlyIterator<Component> getChildrenIterator(Component item) {
-                return SafeOpt.ofNullable(item).map(m -> ReadOnlyIterator.of(m.getChildren())).orElse(ReadOnlyIterator.of());
+            public Iterable<Component> getChildren(Component item) {
+                return SafeOpt.ofNullable(item).map(m -> m.getChildren()).orElse(Arrays.asList());
             }
         };
     }

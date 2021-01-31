@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,17 +22,16 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lt.lb.commons.containers.values.BindingValue;
 import lt.lb.commons.F;
 import lt.lb.commons.Java;
-import lt.lb.commons.misc.ReflectionUtils;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.containers.tuples.Tuples;
+import lt.lb.commons.containers.values.BindingValue;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
-import lt.lb.commons.misc.compare.ExtComparator;
 import lt.lb.commons.misc.NestedException;
+import lt.lb.commons.misc.ReflectionUtils;
 import lt.lb.zk.ZKComponents;
 import lt.lb.zk.ZKValidation;
 import lt.lb.zk.ZKValidation.ExternalValidation;
@@ -54,11 +54,9 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.ListitemRenderer;
-import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Space;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Vbox;
 
 /**
  *
@@ -211,7 +209,7 @@ public class DynamicRow {
         });
 
         updater.addListener(fireListeners -> {
-            ExtComparator<Tuple<Integer, Consumer<DynamicRow>>> cmp = ExtComparator.ofValue(v -> v.g1);
+            Comparator<Tuple<Integer, Consumer<DynamicRow>>> cmp = Comparator.comparing(v -> v.g1);
             listeners.stream().sorted(cmp.reversed()).map(m -> m.g2).forEach(action -> {
                 doRun(DecorType.UPDATE, () -> action.accept(this));
             });
@@ -810,14 +808,14 @@ public class DynamicRow {
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
         return () -> {
             return For.elements().find(mainIterator(), (i, tuple) -> pred.test(Tuples.create(i, tuple.g2)))
-                    .map(m -> m.val.g1).orElse(null);
+                    .map(m -> m.val.g1).throwIfErrorNested().orElse(null);
         };
     }
 
     public Supplier<Component> getComponentSupplier(Integer i) {
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> Objects.equals(i, j))
-                    .map(m -> m.val.g2).orElse(null);
+                    .map(m -> m.val.g2).throwIfErrorNested().orElse(null);
         };
     }
 
@@ -825,7 +823,7 @@ public class DynamicRow {
 
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> pred.test(tuple.g2))
-                    .map(m -> m.val.g2).orElse(null);
+                    .map(m -> m.val.g2).throwIfErrorNested().orElse(null);
         };
     }
 
