@@ -13,10 +13,10 @@
     </repositories>
     <properties>
         
-        <commonslb.commit>efa6cf056f92e6cbd6e556858db3c63ab67ce9d7</commonslb.commit>
+        <commonslb.commit>6.0.5.1</commonslb.commit>
         <commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>
-        <!--<commonslb.commit>local-jar</commonslb.commit>-->
-        <!--<commonslb.dir>lt.lb.commons</commonslb.dir>-->
+<!--        <commonslb.commit>local-jar</commonslb.commit>
+        <commonslb.dir>lt.lb.commons</commonslb.dir>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>

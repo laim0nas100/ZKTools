@@ -474,7 +474,7 @@ public class ZKValidation {
             _markValidation(comp);
             return !full && valid.not(); // early return
 
-        }).getError().throwIfErrorNested();
+        });
         return valid.get();
     }
 

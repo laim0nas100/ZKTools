@@ -62,6 +62,7 @@ import org.zkoss.zul.Textbox;
  *
  * @author laim0nas100
  */
+@Deprecated
 public class DynamicRow {
 
     @Override
@@ -808,14 +809,14 @@ public class DynamicRow {
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
         return () -> {
             return For.elements().find(mainIterator(), (i, tuple) -> pred.test(Tuples.create(i, tuple.g2)))
-                    .map(m -> m.val.g1).throwIfErrorNested().orElse(null);
+                    .map(m -> m.val.g1).orNull();
         };
     }
 
     public Supplier<Component> getComponentSupplier(Integer i) {
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> Objects.equals(i, j))
-                    .map(m -> m.val.g2).throwIfErrorNested().orElse(null);
+                    .map(m -> m.val.g2).orNull();
         };
     }
 
@@ -823,7 +824,7 @@ public class DynamicRow {
 
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> pred.test(tuple.g2))
-                    .map(m -> m.val.g2).throwIfErrorNested().orElse(null);
+                    .map(m -> m.val.g2).orNull();
         };
     }
 
