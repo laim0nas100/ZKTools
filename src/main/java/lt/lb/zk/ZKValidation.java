@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -325,7 +326,8 @@ public class ZKValidation {
     }
 
     // try to ensure uniqueness
-    public static final String WRONG_VALUE_KEY = System.nanoTime() % 100 + "_ZK_Wrong_Value_Key_" + (System.nanoTime() + 50) % 1000;
+    public static final String WRONG_VALUE_KEY = "_LB_ZK_Wrong_Value_Key_";
+    public static final String TRANSFORMED_CONSTRAINT_KEY = "_LB_ZK_Tansfomed_Constraint_";
 
     /**
      * Mark component with wrong value (does not affect display)
@@ -347,9 +349,11 @@ public class ZKValidation {
     }
 
     /**
-     * Show wrong value on component or clean wrong value, depending if component was marked {@link 
+     * Show wrong value on component or clean wrong value, depending if
+     * component was marked {@link ZKValidation#_wrongValue}
+     *
      * @param comp
-     * @return 
+     * @return
      */
     public static boolean _markValidation(Component comp) {
         if (comp.hasAttribute(WRONG_VALUE_KEY)) {
@@ -362,23 +366,50 @@ public class ZKValidation {
         }
     }
 
-    private static boolean _isValid(Component rootComp) {
-        boolean isValid = _markValidation(rootComp);
-        if (isValid && rootComp instanceof InputElement) {
-            InputElement input = (InputElement) rootComp;
-            Constraint cons = input.getConstraint();
-            if (cons != null) {
-                if (!(cons instanceof TransformedContraint)) {
-                    TransformedContraint transformed = transformOld(cons);
-                    input.setConstraint(transformed);
-                }
-                input.getText(); // invoke error if any
-                boolean secondValidation = _markValidation(input);
-                return secondValidation;
-            }
+    private static TransformedContraint resolveOrSet(InputElement input) {
+        Constraint cons = input.getConstraint();
+        if (cons == null) {
+            return null;
+        }
+        TransformedContraint transformed = null;
+        boolean newest = false;
+        if (input.hasAttribute(TRANSFORMED_CONSTRAINT_KEY)) {
+            transformed = (TransformedContraint) input.getAttribute(TRANSFORMED_CONSTRAINT_KEY);
+            newest = Objects.equals(cons, transformed.cons);
 
         }
-        return isValid;
+        if (!newest) {
+            TransformedContraint other = null;
+            if (cons instanceof TransformedContraint) {
+                other = (TransformedContraint) cons;
+            } else {
+                other = transformConstraint(cons);
+            }
+            transformed = other;
+            input.setAttribute(TRANSFORMED_CONSTRAINT_KEY, transformed);
+        }
+        return transformed;
+    }
+
+    private static boolean _isValid(Component rootComp) {
+
+        if (rootComp instanceof InputElement) {
+            InputElement input = (InputElement) rootComp;
+            TransformedContraint transformed = resolveOrSet(input);
+            if (transformed != null) {
+                try {
+                    input.getText(); // invoke error if any
+                    _clearWrongValue(input);
+
+                } catch (WrongValueException ex) {
+                    _wrongValue(input, ex.getMessage());
+                }
+
+                return _markValidation(input);
+            }
+        }
+        return _markValidation(rootComp);
+
     }
 
     private static class CompReformed {
@@ -390,39 +421,32 @@ public class ZKValidation {
         }
 
         private ExternalValidation buildExternalValidation(boolean replace) {
-            LazyDependantValue<Optional<WrongValueException>> exSupl;
-            if (!replace) {
+            LazyDependantValue<Optional<String>> exSupl;
+            if (!replace || input.getConstraint() == null) {
                 exSupl = new LazyDependantValue<>(() -> {
                     try {
                         input.getText();
                         return Optional.empty();
                     } catch (WrongValueException e) {
-                        return Optional.ofNullable(e);
+                        return Optional.ofNullable(e.getMessage());
                     }
                 });
 
             } else {
-                Constraint constraint = input.getConstraint();
+                TransformedContraint transformed = resolveOrSet(input);
 
-                Value<WrongValueException> proxyConst = new Value<>();
                 exSupl = new LazyDependantValue<>(() -> {
-                    input.getText();
-                    return proxyConst.toOptional();
-                });
-
-                TransformedContraint newCon = (Component comp, Object value) -> {
-                    try {
-                        constraint.validate(comp, value);
-                        proxyConst.set(null);
-                    } catch (WrongValueException ex) {
-                        proxyConst.set(ex);
+                    input.getText(); // this does not throw, because it was replaced
+                    if (input.hasAttribute(WRONG_VALUE_KEY)) {
+                        return Optional.ofNullable(input.getAttribute(WRONG_VALUE_KEY)).map(String::valueOf);
+                    } else {
+                        return Optional.empty();
                     }
-                };
-
-                input.setConstraint(newCon);
+                });
+                input.setConstraint(transformed);
             }
 
-            LazyDependantValue<String> msgSupl = exSupl.map(m -> m.map(ex -> ex.getMessage()).orElse(""));
+            LazyDependantValue<String> msgSupl = exSupl.map(m -> m.orElse(""));
             LazyDependantValue<Boolean> validLazySupl = exSupl.map(m -> !m.isPresent());
             Supplier<Boolean> validSupl = () -> {
                 exSupl.invalidate();
@@ -549,19 +573,28 @@ public class ZKValidation {
         return value.get();
     }
 
-    private static interface TransformedContraint extends Constraint {
+    private static class TransformedContraint implements Constraint {
 
-    }
+        final Constraint cons;
 
-    private static TransformedContraint transformOld(Constraint cons) {
-        return (Component comp, Object value) -> {
+        public TransformedContraint(Constraint cons) {
+            this.cons = Objects.requireNonNull(cons);
+        }
+
+        @Override
+        public void validate(Component comp, Object value) throws WrongValueException {
             try {
                 cons.validate(comp, value);
                 _clearWrongValue(comp);
             } catch (WrongValueException e) {
                 _wrongValue(comp, e.getMessage());
             }
-        };
+        }
+
+    }
+
+    private static TransformedContraint transformConstraint(Constraint cons) {
+        return new TransformedContraint(cons);
     }
 
     public static class Premade {
