@@ -24,11 +24,6 @@
     
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>28.1-jre</version>
-        </dependency>
-        <dependency>
             <groupId>${commonslb.dir}</groupId>
             <artifactId>commonslb-core</artifactId>
             <version>${commonslb.commit}</version>

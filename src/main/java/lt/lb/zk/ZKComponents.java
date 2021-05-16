@@ -1,6 +1,5 @@
 package lt.lb.zk;
 
-import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -137,7 +136,7 @@ public class ZKComponents {
     }
 
     public static <T extends Component> T createZul(String path, Tuple... arguments) {
-        Map args = Maps.newHashMap();
+        Map args = new HashMap<>();
         for (Tuple tup : arguments) {
             args.put(tup.g1, tup.g2);
         }

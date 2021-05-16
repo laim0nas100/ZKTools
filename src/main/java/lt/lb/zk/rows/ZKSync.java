@@ -1,6 +1,5 @@
 package lt.lb.zk.rows;
 
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -196,7 +195,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
             return obList.stream().filter(m -> m.isSelected()).map(m -> (T) m.getValue()).collect(Collectors.toList());
         });
         sync.withDisplaySet(val -> {
-            HashSet<T> set = Sets.newHashSet(val);
+            HashSet<T> set = new HashSet<>(val);
             return box.getItems().stream().filter(f -> set.contains((T) f.getValue())).collect(Collectors.toSet());
         });
         box.setItemRenderer(new ListitemRenderInfoRenderer<T>(){
