@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lt.lb.commons.F;
 import lt.lb.commons.misc.UUIDgenerator;
-import lt.lb.commons.containers.caching.LazyDependantValue;
+import lt.lb.commons.containers.caching.lazy.LazyValue;
+import lt.lb.commons.containers.caching.lazy.LazyProxy;
 import lt.lb.commons.iteration.For;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Cell;
@@ -41,7 +42,7 @@ public class DynamicRows {
 
     private Map<String, DynamicRows> composable = new HashMap<>();
 
-    private LazyDependantValue<Map<String, Integer>> rowKeyOrder = new LazyDependantValue<>(() -> {
+    private LazyProxy<Map<String, Integer>> rowKeyOrder = new LazyValue<>(() -> {
         HashMap<String, Integer> indexMap = new HashMap<>();
         for (DynamicRow row : rowMap.values()) {
             indexMap.put(row.getKey(), this.getRowIndex(row.getKey()));
@@ -51,14 +52,14 @@ public class DynamicRows {
 //        }
         return indexMap;
     });
-    private LazyDependantValue<List<DynamicRow>> rowsInOrder = rowKeyOrder.map(m -> {
+    private LazyProxy<List<DynamicRow>> rowsInOrder = rowKeyOrder.map(m -> {
         List<DynamicRow> collect = rowMap.values().stream().collect(Collectors.toList());
         Comparator<DynamicRow> ofValue = Comparator.comparing(r -> m.getOrDefault(r.getKey(), -1));
         Collections.sort(collect, ofValue);
         return collect;
     });
 
-    private LazyDependantValue<List> dynamicRowsAndRowsInOrder = rowsInOrder.map(m -> {
+    private LazyProxy<List> dynamicRowsAndRowsInOrder = rowsInOrder.map(m -> {
 
         Map<Integer, List> composed = new HashMap<>();
 

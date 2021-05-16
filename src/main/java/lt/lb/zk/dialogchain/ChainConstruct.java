@@ -1,7 +1,8 @@
 package lt.lb.zk.dialogchain;
 
-import lt.lb.commons.func.unchecked.UncheckedConsumer;
-import lt.lb.commons.func.unchecked.UncheckedRunnable;
+import lt.lb.uncheckedutils.func.UncheckedConsumer;
+import lt.lb.uncheckedutils.func.UncheckedRunnable;
+
 
 /**
  *

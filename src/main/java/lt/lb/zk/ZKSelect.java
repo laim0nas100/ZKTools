@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import lt.lb.commons.SafeOpt;
 import lt.lb.commons.iteration.TreeVisitor;
+import lt.lb.uncheckedutils.SafeOpt;
 import org.zkoss.zk.ui.Component;
 
 /**

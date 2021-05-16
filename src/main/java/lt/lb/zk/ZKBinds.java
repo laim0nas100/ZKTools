@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import lt.lb.commons.ArrayOp;
-import lt.lb.commons.F;
 import lt.lb.commons.Ins;
 import lt.lb.commons.reflect.FieldChain;
+import lt.lb.uncheckedutils.Checked;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
@@ -105,7 +105,7 @@ public class ZKBinds {
                 callback.call(cast, field, object);
             });
             if (init) {
-                F.uncheckedRun(() -> {
+                Checked.uncheckedRun(() -> {
                     callback.updateUI(cast, field, object);
                 });
             }

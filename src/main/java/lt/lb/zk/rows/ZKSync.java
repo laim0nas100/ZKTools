@@ -7,16 +7,14 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lt.lb.commons.F;
-import lt.lb.commons.SafeOpt;
-import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.datasync.base.NodeSync;
 import lt.lb.commons.func.BiConverter;
+import lt.lb.uncheckedutils.SafeOpt;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
@@ -33,7 +31,6 @@ import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Longbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.impl.InputElement;
-import lt.lb.commons.func.BiConverter;
 
 /**
  *

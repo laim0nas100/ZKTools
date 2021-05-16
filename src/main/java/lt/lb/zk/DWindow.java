@@ -1,7 +1,7 @@
 package lt.lb.zk;
 
 import java.util.concurrent.Callable;
-import lt.lb.commons.SafeOpt;
+import lt.lb.uncheckedutils.SafeOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;

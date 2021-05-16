@@ -30,8 +30,9 @@ import lt.lb.commons.containers.values.BindingValue;
 import lt.lb.commons.containers.values.ValueProxy;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
-import lt.lb.commons.misc.NestedException;
 import lt.lb.commons.misc.ReflectionUtils;
+import lt.lb.uncheckedutils.Checked;
+import lt.lb.uncheckedutils.NestedException;
 import lt.lb.zk.ZKComponents;
 import lt.lb.zk.ZKValidation;
 import lt.lb.zk.ZKValidation.ExternalValidation;
@@ -649,14 +650,14 @@ public class DynamicRow {
     public DynamicRow addButton(String title, EventListener event) {
         Button but = new Button(title);
         but.addEventListener(Events.ON_CLICK, e -> {
-            doRun(DecorType.UI, () -> F.uncheckedRun(() -> event.onEvent(e)));
+            doRun(DecorType.UI, () -> Checked.uncheckedRun(() -> event.onEvent(e)));
         });
         return this.add(but);
     }
 
     public DynamicRow addButton(Button but, EventListener event) {
         but.addEventListener(Events.ON_CLICK, e -> {
-            doRun(DecorType.UI, () -> F.uncheckedRun(() -> event.onEvent(e)));
+            doRun(DecorType.UI, () -> Checked.uncheckedRun(() -> event.onEvent(e)));
         });
         return this.add(but);
     }
@@ -809,14 +810,14 @@ public class DynamicRow {
     public Supplier<Cell> getCellSupplier(Predicate<Tuple<Integer, Component>> pred) {
         return () -> {
             return For.elements().find(mainIterator(), (i, tuple) -> pred.test(Tuples.create(i, tuple.g2)))
-                    .map(m -> m.val.g1).orNull();
+                    .map(m -> m.val.g1).orElse(null);
         };
     }
 
     public Supplier<Component> getComponentSupplier(Integer i) {
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> Objects.equals(i, j))
-                    .map(m -> m.val.g2).orNull();
+                    .map(m -> m.val.g2).orElse(null);
         };
     }
 
@@ -824,7 +825,7 @@ public class DynamicRow {
 
         return () -> {
             return For.elements().find(mainIterator(), (j, tuple) -> pred.test(tuple.g2))
-                    .map(m -> m.val.g2).orNull();
+                    .map(m -> m.val.g2).orElse(null);
         };
     }
 
@@ -999,7 +1000,7 @@ public class DynamicRow {
     public DynamicRow display(boolean updateView) {
 
         if (!done) {
-            Optional<Throwable> optionalException = F.checkedRun(() -> {
+            Optional<Throwable> optionalException = Checked.checkedRun(() -> {
                 onDisplay.forEach(runnable -> runnable.run());
                 this.update();
             });
@@ -1125,7 +1126,7 @@ public class DynamicRow {
             StringBuilder sb = new StringBuilder();
             sb.append("cell=").append(c).append(" with =");
             sb.append(c.getChildren().get(0));
-            F.uncheckedRun(() -> {
+            Checked.uncheckedRun(() -> {
                 Class cl = c.getClass();
                 while (!Object.class.equals(cl)) {
                     Field field = cl.getDeclaredField("_auxinf");

@@ -9,8 +9,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lt.lb.commons.F;
 import lt.lb.commons.iteration.For;
-import lt.lb.commons.misc.NestedException;
 import lt.lb.commons.rows.SyncDrow;
+import lt.lb.uncheckedutils.Checked;
+import lt.lb.uncheckedutils.NestedException;
 import lt.lb.zk.ZKValidation;
 import lt.lb.zk.dynamicrows.RadioComboboxMapper;
 import org.zkoss.zk.ui.Component;
@@ -102,7 +103,7 @@ public abstract class ZKBaseDrow<R extends ZKBaseDrow<R, DR>, DR extends ZKBaseD
         AtomicBoolean pressed = new AtomicBoolean(false);
         but.addEventListener(Events.ON_CLICK, e -> {
             if (pressed.compareAndSet(false, true)) {
-                Optional<Throwable> checkedRun = F.checkedRun(() -> {
+                Optional<Throwable> checkedRun = Checked.checkedRun(() -> {
                     event.accept(me());
                 });
 

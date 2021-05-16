@@ -14,18 +14,17 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import lt.lb.commons.SafeOpt;
-import lt.lb.commons.containers.caching.LazyDependantValue;
-import lt.lb.commons.containers.caching.LazyValue;
+import lt.lb.commons.containers.caching.lazy.LazyProxy;
+import lt.lb.commons.containers.caching.lazy.LazyValue;
 import lt.lb.commons.containers.values.BooleanValue;
-import lt.lb.commons.containers.values.Value;
 import lt.lb.commons.containers.values.ValueProxy;
-import lt.lb.commons.func.unchecked.UncheckedSupplier;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
 import lt.lb.commons.iteration.TreeVisitor;
 import lt.lb.commons.iteration.Visitor;
 import lt.lb.commons.parsing.StringOp;
+import lt.lb.uncheckedutils.SafeOpt;
+import lt.lb.uncheckedutils.func.UncheckedSupplier;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.util.Clients;
@@ -421,9 +420,9 @@ public class ZKValidation {
         }
 
         private ExternalValidation buildExternalValidation(boolean replace) {
-            LazyDependantValue<Optional<String>> exSupl;
+            LazyProxy<Optional<String>> exSupl;
             if (!replace || input.getConstraint() == null) {
-                exSupl = new LazyDependantValue<>(() -> {
+                exSupl = new LazyValue<>(() -> {
                     try {
                         input.getText();
                         return Optional.empty();
@@ -435,7 +434,7 @@ public class ZKValidation {
             } else {
                 TransformedContraint transformed = resolveOrSet(input);
 
-                exSupl = new LazyDependantValue<>(() -> {
+                exSupl = new LazyValue<>(() -> {
                     input.getText(); // this does not throw, because it was replaced
                     if (input.hasAttribute(WRONG_VALUE_KEY)) {
                         return Optional.ofNullable(input.getAttribute(WRONG_VALUE_KEY)).map(String::valueOf);
@@ -446,8 +445,8 @@ public class ZKValidation {
                 input.setConstraint(transformed);
             }
 
-            LazyDependantValue<String> msgSupl = exSupl.map(m -> m.orElse(""));
-            LazyDependantValue<Boolean> validLazySupl = exSupl.map(m -> !m.isPresent());
+            LazyProxy<String> msgSupl = exSupl.map(m -> m.orElse(""));
+            LazyProxy<Boolean> validLazySupl = exSupl.map(m -> !m.isPresent());
             Supplier<Boolean> validSupl = () -> {
                 exSupl.invalidate();
                 return validLazySupl.get();
@@ -487,9 +486,9 @@ public class ZKValidation {
         }
         For.entries().find(map, (comp, validationList) -> {
             //find first invalid validation
-            SafeOpt<String> finalVal = For.elements().find(validationList, (i, validation) -> !validation.isValid())
+            Optional<String> finalVal = For.elements().find(validationList, (i, validation) -> !validation.isValid())
                     .map(m -> m.val.message.get());
-            if (finalVal.hasValueOrError()) { // invalid
+            if (finalVal.isPresent()) { // invalid
                 _wrongValue(comp, finalVal.get());
                 valid.setFalse();
             } else {
