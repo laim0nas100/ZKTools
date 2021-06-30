@@ -48,11 +48,14 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     }
 
     @Override
-    public void renderRow(R row) {
+    public void renderRow(R row, boolean dirty) {
         ZKLine<R, DR> line = F.cast(row.getLine());
-        DR rows = line.getRows();
+        DR rows = line.getRows().getLastParentOrMe();
+        int rowIndex = rows.getVisibleRowIndex(row.getKey());
+        if (!baseDerenderContinue(line, rowIndex, dirty)) {
+            return;
+        }
         Rows zkRows = rows.getZKRows();
-        line.derender();
         line.setDerender(() -> {
             line.row.detach();
             line.row.getChildren().clear();
@@ -65,8 +68,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
             return;
         }
 
-        Integer rowIndex = rows.getVisibleRowIndex(row.getKey());
-        if (rowIndex == -1) {
+        if (rowIndex < 0) {
             throw new IllegalArgumentException(row.getKey() + " was not in " + rows.getComposableKey());
         }
         zkRows.getChildren().add(rowIndex, line.row);
