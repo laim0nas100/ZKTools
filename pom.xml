@@ -13,10 +13,10 @@
     </repositories>
     <properties>
         
-<!--        <commonslb.commit>2021.05v1</commonslb.commit>
-        <commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>-->
-       <commonslb.commit>local-jar</commonslb.commit>
-        <commonslb.dir>lt.lb.commons</commonslb.dir>
+        <commonslb.commit>2021.07v2</commonslb.commit>
+        <commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>
+       <!--<commonslb.commit>local-jar</commonslb.commit>-->
+        <!--<commonslb.dir>lt.lb.commons</commonslb.dir>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -60,11 +60,6 @@
             <groupId>${commonslb.dir}</groupId>
             <artifactId>commonslb-rows</artifactId>
             <version>${commonslb.commit}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.laim0nas100</groupId>
-            <artifactId>UncheckedUtils</artifactId>
-            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>org.zkoss.zk</groupId>

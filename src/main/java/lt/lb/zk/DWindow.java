@@ -91,11 +91,16 @@ public class DWindow extends Window implements AfterCompose {
      */
     protected void handleCloseEvent(Event event) {
         event.stopPropagation();
-
-        Object result = SafeOpt.selectFirstPresent(
-                SafeOpt.ofNullable(resultProvider).map(m -> m.call()),
-                SafeOpt.ofNullable(event).map(m -> m.getData())
-        ).orElse(null);
+        SafeOpt map = SafeOpt.ofNullable(resultProvider).map(m -> m.call());
+        SafeOpt map1 = SafeOpt.ofNullable(event).map(m -> m.getData());
+        
+        
+        Object result = null;
+        if(map.isPresent()){
+            result = map.get();
+        }else if(map1.isPresent()){
+            result = map1.get();
+        }
 
         closeDialog(result);
     }
