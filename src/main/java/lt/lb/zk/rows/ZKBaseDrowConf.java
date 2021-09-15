@@ -131,8 +131,8 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
         SafeOpt.of(line.getRenderedNodes())
                 .map(m -> m.get(index))
                 .select(Cell.class)
-                .ifPresent(m -> m.setValign(defaultGridValign))
-                .ifPresent(m -> m.setAlign(align));
+                .peek(m -> m.setValign(defaultGridValign))
+                .peek(m -> m.setAlign(align));
 
     }
 

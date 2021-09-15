@@ -52,9 +52,9 @@ public class RadioComboboxMapper<T> {
     public RadioComboboxMapper<T> selectIndex(int i) {
         IntRange.of(0, options.size()).assertIndexBoundsExclusive(i);
         if (isRadio()) {
-            SafeOpt.ofNullable(radio).ifPresent(b -> b.setSelectedIndex(i)).throwIfErrorAsNested();
+            SafeOpt.ofNullable(radio).peek(b -> b.setSelectedIndex(i)).throwIfErrorAsNested();
         } else {
-            SafeOpt.ofNullable(combo).ifPresent(b -> b.setSelectedIndex(i)).throwIfErrorAsNested();
+            SafeOpt.ofNullable(combo).peek(b -> b.setSelectedIndex(i)).throwIfErrorAsNested();
         }
 
         return this;
