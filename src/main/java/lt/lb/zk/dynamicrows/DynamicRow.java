@@ -428,11 +428,11 @@ public class DynamicRow {
     }
 
     public DynamicRow addRadiobox(String... things) {
-        return addRadioCombobox(RowComp.comboNames(things).withRadio(true));
+        return addRadioCombobox(RowComponents.comboNames(things).withRadio(true));
     }
 
     public DynamicRow addCombobox(String... things) {
-        return addRadioCombobox(RowComp.comboNames(things).withReadOnly(true));
+        return addRadioCombobox(RowComponents.comboNames(things).withReadOnly(true));
     }
 
     public DynamicRow addComponentDirectly(String compName) {

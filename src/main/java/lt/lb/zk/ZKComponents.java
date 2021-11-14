@@ -3,12 +3,14 @@ package lt.lb.zk;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.misc.Range;
 import lt.lb.commons.misc.UUIDgenerator;
+import lt.lb.fastid.FastIDGen;
 import lt.lb.zk.Builder.EagerBuilder;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -47,6 +49,85 @@ public class ZKComponents {
 
     public static <T extends Component> Builder<T> builderOf(T comp) {
         return new EagerBuilder<>(comp);
+    }
+
+    public static class DialogBuilder extends EagerBuilder<DWindow> {
+
+        static FastIDGen gen = new FastIDGen();
+
+        public DialogBuilder(DWindow initial) {
+            super(initial);
+            initial.setId("DWindow_" + gen.getAndIncrement().toString());
+        }
+
+        public DialogBuilder() {
+            this(new DWindow());
+        }
+
+        @Override
+        public DialogBuilder with(Consumer<DWindow> cons) {
+            cons.accept(value);
+            return this;
+        }
+
+        public DialogBuilder setTitle(String title) {
+            return with(c -> c.setTitle(title));
+        }
+
+        public DialogBuilder setParent(Component parent) {
+            return with(c -> c.setParent(parent));
+        }
+
+        public DialogBuilder setClosable(boolean closable) {
+            return with(c -> c.setClosable(closable));
+        }
+
+        public DialogBuilder setHeight(int h) {
+            return with(c -> {
+                if (h < 0 || h > 100) {
+                    throw new IllegalArgumentException("Height percent out of bounds:" + h);
+                }
+                c.setHeight(h + "%");
+            });
+        }
+
+        public DialogBuilder setWidth(int w) {
+            return with(c -> {
+                if (w < 0 || w > 100) {
+                    throw new IllegalArgumentException("Width percent out of bounds:" + w);
+                }
+                c.setWidth(w + "%");
+            });
+        }
+
+        public DialogBuilder makeFlexibleFitWidth(int w) {
+            return setWidth(w).with(c -> {
+                c.setHeight("min");
+                c.setContentStyle("overflow:auto;");
+            });
+        }
+        
+        public DialogBuilder makeFlexibleFitWidthNotClosable(int w) {
+            return setWidth(w).with(c -> {
+                c.setHeight("min");
+                c.setContentStyle("overflow:auto;");
+                c.setClosable(false);
+            });
+        }
+
+        public DialogBuilder makeFlexible() {
+            return with(c -> {
+                c.setContentStyle("overflow:auto;");
+            });
+        }
+
+        public DialogBuilder makeFitSize() {
+            return with(c -> {
+                c.setHeight("min");
+                c.setWidth("min");
+            });
+        }
+
     }
 
     public static Window getFlexibleWindow() {
@@ -109,8 +190,6 @@ public class ZKComponents {
 
         return grid;
     }
-
-    
 
     public static <T extends Component> T createZulComponent(String compName, Map<?, ?> args, Component parent, Tuple<String, Object>... params) {
         LineStringBuilder zk = new LineStringBuilder();
