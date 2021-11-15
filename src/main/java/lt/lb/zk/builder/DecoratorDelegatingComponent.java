@@ -1,6 +1,6 @@
 package lt.lb.zk.builder;
 
-import lt.lb.commons.containers.values.Props;
+import lt.lb.commons.containers.collections.Props;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlMacroComponent;
 import org.zkoss.zk.ui.select.annotation.Wire;

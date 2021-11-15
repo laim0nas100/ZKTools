@@ -2,7 +2,7 @@ package lt.lb.zk.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import lt.lb.commons.containers.values.Props;
+import lt.lb.commons.containers.collections.Props;
 
 /**
  *

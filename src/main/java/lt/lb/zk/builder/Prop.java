@@ -1,6 +1,6 @@
 package lt.lb.zk.builder;
 
-import lt.lb.commons.containers.values.Props;
+import lt.lb.commons.containers.collections.Props;
 import lt.lb.commons.parsing.StringParserWithDefaultValue;
 import lt.lb.uncheckedutils.SafeOpt;
 
