@@ -12,13 +12,16 @@ import lt.lb.commons.misc.Range;
 import lt.lb.commons.misc.UUIDgenerator;
 import lt.lb.fastid.FastIDGen;
 import lt.lb.zk.Builder.EagerBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Columns;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Foot;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
@@ -29,22 +32,20 @@ import org.zkoss.zul.Window;
  */
 public class ZKComponents {
 
-    public static Textbox textboxMultiline(String text) {
+    public static Textbox textboxMultiline(String text, int rows, boolean resize) {
         Textbox tb = new Textbox(text);
 
-        tb.setStyle(F.nullWrap(tb.getStyle(), "") + "; resize:vertical;");
+        if (resize) {
+            tb.setStyle(F.nullWrap(tb.getStyle(), "") + "; resize:vertical;");
+        }
         tb.setVflex("max");
         tb.setMultiline(true);
+        tb.setRows(rows);
         return tb;
     }
 
     public static Textbox textboxMultiline() {
-        return textboxMultiline(null);
-    }
-
-    public static Textbox textbox(int length) {
-        return builderOf(new Textbox()).with(t -> t.setMaxlength(length)).build();
-
+        return textboxMultiline("", 1, true);
     }
 
     public static <T extends Component> Builder<T> builderOf(T comp) {
@@ -106,7 +107,7 @@ public class ZKComponents {
                 c.setContentStyle("overflow:auto;");
             });
         }
-        
+
         public DialogBuilder makeFlexibleFitWidthNotClosable(int w) {
             return setWidth(w).with(c -> {
                 c.setHeight("min");
@@ -228,5 +229,14 @@ public class ZKComponents {
 
     public static <T extends Component> T createZul(String path, Component parent, Map<?, ?> args) {
         return F.cast(Executions.createComponents(path, parent, args));
+    }
+
+    public static <T extends HtmlBasedComponent> T appendStyle(T comp, String style) {
+        String styleToSet = StringUtils.appendIfMissing(style, ";");
+        if (comp.getStyle() != null) {
+            styleToSet = StringUtils.appendIfMissing(comp.getStyle(), ";") + styleToSet;
+        }
+        comp.setStyle(styleToSet);
+        return comp;
     }
 }

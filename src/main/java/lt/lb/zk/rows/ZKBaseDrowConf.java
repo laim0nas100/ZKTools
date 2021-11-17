@@ -12,9 +12,10 @@ import lt.lb.commons.F;
 import lt.lb.commons.Ins;
 import lt.lb.commons.datasync.Valid;
 import lt.lb.commons.iteration.For;
-import lt.lb.commons.parsing.StringOp;
 import lt.lb.commons.rows.base.BaseDrowSyncConf;
 import lt.lb.uncheckedutils.SafeOpt;
+import lt.lb.zk.ZKComponents;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Cell;
 import org.zkoss.zul.Hlayout;
@@ -28,6 +29,8 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
 
     public String defaultGridValign = "middle";
     public boolean preferCenterAllign = false;
+    //up, right, down, left
+    public String padding = "padding:2px 2px 5px 2px;";
 
     public ZKBaseDrowConf() {
     }
@@ -36,7 +39,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
     public Component getEnclosingNode(ZKBaseDrow drow) {
         Hlayout hlayout = new Hlayout();
         hlayout.setHflex("1");
-        return hlayout;
+        return ZKComponents.appendStyle(hlayout, padding);
     }
 
     @Override
@@ -103,6 +106,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
                 line.getRenderedNodes().add(cell);
                 line.row.appendChild(cell);
             }
+            line.row.invalidate();
         }
 
         if (line.getRenderedNodes().size() == 1) {
@@ -125,7 +129,7 @@ public class ZKBaseDrowConf<R extends ZKBaseDrow, DR extends ZKBaseDrows<R, DR>>
 
     protected void conditionalAlligment(ZKLine<R, DR> line, int index, String align) {
 
-        if (StringOp.isNotEmpty(line.getCells().get(index).getAllign())) { // something is defined, don't use default
+        if (StringUtils.isNotEmpty(line.getCells().get(index).getAllign())) { // something is defined, don't use default
             return;
         }
         SafeOpt.of(line.getRenderedNodes())
