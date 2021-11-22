@@ -13,7 +13,7 @@
     </repositories>
     <properties>
         
-        <commonslb.commit>2021.11v1</commonslb.commit>
+        <commonslb.commit>2021.11v2</commonslb.commit>
         <commonslb.dir>com.github.laim0nas100.Commons</commonslb.dir>
        <!--<commonslb.commit>local-jar</commonslb.commit>-->
         <!--<commonslb.dir>lt.lb.commons</commonslb.dir>-->
@@ -78,11 +78,6 @@
             <artifactId>zkbind</artifactId>
             <version>6.5.3</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
         </dependency>
     </dependencies>
     <build>
