@@ -1,6 +1,6 @@
 package lt.lb.zk;
 
-import lt.lb.commons.parsing.StringOp;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.event.EventListener;
@@ -39,7 +39,7 @@ public class ZKTools {
     public static String styleAppend(HtmlBasedComponent htmlComp, String style) {
         String oldStyle = htmlComp.getStyle();
 
-        htmlComp.setStyle(StringOp.join(oldStyle, style));
+        htmlComp.setStyle(StringUtils.join(oldStyle, style));
         return oldStyle;
     }
     

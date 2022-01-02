@@ -22,9 +22,9 @@ import lt.lb.commons.iteration.For;
 import lt.lb.commons.iteration.ReadOnlyIterator;
 import lt.lb.commons.iteration.TreeVisitor;
 import lt.lb.commons.iteration.Visitor;
-import lt.lb.commons.parsing.StringOp;
 import lt.lb.uncheckedutils.SafeOpt;
 import lt.lb.uncheckedutils.func.UncheckedSupplier;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.util.Clients;
@@ -603,7 +603,7 @@ public class ZKValidation {
         }
 
         public static Supplier<Boolean> validationNotBlank(InputElement elem) {
-            return () -> StringOp.isNotBlank(elem.getText());
+            return () -> StringUtils.isNotBlank(elem.getText());
         }
 
         public static Supplier<Boolean> validationNoFuture(Datebox elem, boolean nullTolerance) {
