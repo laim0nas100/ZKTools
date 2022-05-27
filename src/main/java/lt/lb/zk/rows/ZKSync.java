@@ -109,7 +109,7 @@ public class ZKSync<P, D, N extends Component> extends NodeSync<P, D, N, ZKValid
         sync.withNoConversion();
         sync.withDisplaySup(() -> tb.isChecked());
         sync.withDisplaySync(supl -> {
-            boolean con = F.nullWrap(supl, false);
+            boolean con = supl == null ? false : supl;
             tb.setChecked(con);
         });
         sync.withPersistProxy(persistProxy);

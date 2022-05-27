@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import lt.lb.commons.F;
 import lt.lb.commons.LineStringBuilder;
+import lt.lb.commons.Nulls;
 import lt.lb.commons.containers.tuples.Tuple;
 import lt.lb.commons.iteration.For;
 import lt.lb.commons.misc.Range;
@@ -21,7 +22,6 @@ import org.zkoss.zul.Columns;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Foot;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
@@ -36,7 +36,7 @@ public class ZKComponents {
         Textbox tb = new Textbox(text);
 
         if (resize) {
-            tb.setStyle(F.nullWrap(tb.getStyle(), "") + "; resize:vertical;");
+            tb.setStyle(Nulls.requireNonNullElse(tb.getStyle(), "") + "; resize:vertical;");
         }
         tb.setVflex("max");
         tb.setMultiline(true);
